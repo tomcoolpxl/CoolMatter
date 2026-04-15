@@ -79,3 +79,15 @@ Verified on April 15, 2026:
 * added integration coverage for the sampled pipeline boundary in `tests/integration/sampling-pipeline.test.js`
 * updated the aggregated validation integration expectation in `tests/integration/validation-runner.test.js`
 * verified the standard verification pass with `npm run check`
+
+## Phase 1 chunk 6
+
+Verified on April 15, 2026:
+
+* implemented sampled radial histogram validation in `src/validation/histogramChecks.js`
+* compared sampled radial behavior against the expected truncated radial structure for `1s` and `2s`
+* extended the aggregated validation pipeline to include histogram checks in `src/validation/runValidation.js`
+* added unit coverage for histogram validation in `tests/unit/histogram-checks.test.js`
+* added integration coverage for histogram results in `tests/integration/sampling-pipeline.test.js`
+* updated the aggregated validation integration expectation in `tests/integration/validation-runner.test.js`
+* verified the standard verification pass with `npm run check`

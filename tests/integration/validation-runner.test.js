@@ -6,7 +6,7 @@ describe('validation runner', () => {
   it('executes the full scientific validation pipeline successfully', () => {
     const results = collectValidationResults()
 
-    expect(results).toHaveLength(16)
+    expect(results).toHaveLength(18)
     expect(results.every((result) => result.pass)).toBe(true)
 
     const normalization2s = results.find(
@@ -16,6 +16,8 @@ describe('validation runner', () => {
     expect(normalization2s.measuredResult.radialCutoff).toBe(12)
     expect(results.some((result) => result.checkName === 'deterministic rng sequence')).toBe(true)
     expect(results.some((result) => result.checkName === 'deterministic sampling summary')).toBe(true)
+    expect(results.some((result) => result.checkName === 'radial histogram (1s)')).toBe(true)
+    expect(results.some((result) => result.checkName === 'radial histogram (2s)')).toBe(true)
     expect(results.some((result) => result.checkName === 'invalid truncation failure')).toBe(true)
   })
 })

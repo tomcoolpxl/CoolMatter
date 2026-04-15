@@ -10,4 +10,5 @@ export const validationTolerances = {
   normalizationEstimate: 5e-5,
   nodeRadius: 1e-6,
   nodeAmplitude: 1e-8,
+  histogramBinFrequency: 0.05,
 }

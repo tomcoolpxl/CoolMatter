@@ -31,4 +31,16 @@ describe('sampling pipeline', () => {
     expect(samplingResult.measuredResult.sampleCount).toBe(4)
     expect(samplingResult.measuredResult.stateId).toBe(config.initialStateId)
   })
+
+  it('exposes histogram validation in the aggregated validation pipeline', () => {
+    const results = collectValidationResults()
+    const histogramResult = results.find(
+      (result) => result.checkName === 'radial histogram (1s)',
+    )
+
+    expect(histogramResult).toBeDefined()
+    expect(histogramResult.pass).toBe(true)
+    expect(histogramResult.measuredResult.sampleCount).toBe(6000)
+    expect(histogramResult.measuredResult.maxBinError).toBeLessThanOrEqual(histogramResult.tolerance)
+  })
 })

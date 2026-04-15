@@ -1,8 +1,12 @@
 # Current TODO
 
-## Phase 1 chunk 6
+## Phase 2 chunk 1
 
-* implement `src/validation/histogramChecks.js`
-* compare sampled radial behavior against the expected truncated radial structure
-* add unit and integration coverage for histogram validation
+* implement `src/scene/createScene.js`
+* implement `src/scene/createCamera.js`
+* implement `src/scene/createRenderer.js`
+* implement `src/scene/createControls.js`
+* implement `src/scene/createLights.js`
+* implement the minimal app bootstrap needed to render an empty black scene with orbit controls
+* add unit and integration coverage for the scene shell
 * verify `npm run check`
