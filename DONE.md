@@ -1,5 +1,13 @@
 # Done
 
+## Version 2 - Phase 1 chunk 1
+
+Verified on April 15, 2026:
+
+* implemented `src/utils/complex.js` with `add`, `multiply`, `scale`, `magnitudeSq`, and `expImaginary` utilities
+* added unit tests `tests/unit/complex.test.js` confirming correct complex arithmetic and euler formula implementation
+* tests passed without regressions
+
 ## Phase 1 chunk 1
 
 Verified on April 15, 2026:
