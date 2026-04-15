@@ -1,6 +1,14 @@
 # Done
 
 ## Version 2 - Phase 1 chunk 1
+## Version 2 - Phase 1 chunk 2 & 3
+
+Verified on April 15, 2026:
+
+* implemented generalized radial evaluator `src/physics/hydrogen/radial.js` (Laguerre Polynomials and factorials)
+* implemented generalized angular evaluator `src/physics/hydrogen/angular.js` (Legendre Polynomials computing Complex outputs)
+* confirmed backward backwards compatibility for hardcoded 1s and 2s eigenstates running V1 numerical tests
+
 
 Verified on April 15, 2026:
 
@@ -220,3 +228,12 @@ Verified on April 15, 2026:
 * extended `tests/unit/vite-config.test.js` to lock the chunking rule in place
 * removed the now-obsolete deferred optimization note from `TODO.md`
 * re-verified the standard verification pass with `npm run check`
+
+## Version 2 Phase 1
+- `src/utils/complex.js`: Implemented pure, rigorous complex arithmetic system.
+- `src/physics/hydrogen/radial.js`: Refactored to support n up to arbitrary limits by using exact Laguerre evaluation algorithms.
+- `src/physics/hydrogen/angular.js`: Provided rigorous recursive implementations for associated Legendre polynomials and full spherical harmonics.
+- `src/physics/constants.js`: Refactored energy evaluations and math constants correctly for V2 needs.
+- `src/physics/hydrogen/superposition.js`: Evaluator scaling any spatial components by arbitrary complex weight. Correctly mixes individual densities across (r, theta, phi) and maps probability through time t based on energy eigenvalue differences.
+- `tests/unit/superposition.test.js`: Verified components compile correctly without blowing up when added.
+- `src/validation/superpositionChecks.js`: Mathematically validates numerical integrals sum out probabilities tightly across multiple time periods. Passes `npm run validate`.

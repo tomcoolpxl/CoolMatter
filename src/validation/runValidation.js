@@ -5,6 +5,7 @@ import { runDeterministicChecks } from './deterministicChecks.js'
 import { runHistogramChecks } from './histogramChecks.js'
 import { runNodeChecks } from './nodeChecks.js'
 import { runNormalizationChecks } from './normalizationChecks.js'
+import { runSuperpositionChecks } from './superpositionChecks.js'
 import { runTruncationChecks } from './truncationChecks.js'
 
 export function collectValidationResults() {
@@ -14,6 +15,7 @@ export function collectValidationResults() {
     ...runHistogramChecks(),
     ...runNormalizationChecks(),
     ...runNodeChecks(),
+    ...runSuperpositionChecks(),
     ...runTruncationChecks(),
   ]
 }

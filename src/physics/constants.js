@@ -12,3 +12,7 @@ export const validationTolerances = {
   nodeAmplitude: 1e-8,
   histogramBinFrequency: 0.05,
 }
+
+export function calculateEnergyHartree(n) {
+  return -1.0 / (2.0 * n * n);
+}

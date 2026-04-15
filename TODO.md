@@ -3,14 +3,16 @@
 ## Version 2 - Phase 1
 
 ### Current chunk
-- [ ] Generalized Radial Evaluator (`src/physics/hydrogen/radial.js`)
-  - [ ] Implement factorials
-  - [ ] Implement Generalized Laguerre Polynomials
-  - [ ] Refactor $R_{nl}$ to support arbitrary $n$ and $l$
-  - [ ] Add unit tests and assert backwards compatibility with 1s and 2s
+✅ Clean up and refactor math logic
+✅ Implement `src/utils/complex.js`
+✅ Refactor `radial.js` and `angular.js` for arbitrary $n, l, m$
+✅ Implement `src/physics/hydrogen/superposition.js`
+✅ Integrate and pass tests in `runValidation.js`
+
+## Version 2 - Phase 2
+- [ ] Implement robust `createProbabilityVolume` sampler.
+- [ ] Handle 3D voxel grids or monte-carlo scattering for superposition mixtures.
 
 ## Version 1 status
-
-* version 1 implementation is complete for the currently documented scope
-* the April 15, 2026 code-review findings have been addressed in code, tests, and docs
-* start new TODO items only when a new scoped change is accepted
+* Version 1 implementation complete.
+* See `DONE.md` for historical completion record.

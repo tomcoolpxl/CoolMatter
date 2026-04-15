@@ -1,5 +1,5 @@
 export const validationSummary = {
   command: 'npm run validate',
-  expectedCheckCount: 18,
+  expectedCheckCount: 19,
   statusText: 'Offline validation required before signoff',
 }
