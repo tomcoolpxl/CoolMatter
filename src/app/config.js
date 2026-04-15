@@ -5,7 +5,11 @@ export const config = {
   defaultTruncationRadius: 12,
   defaultPointSize: 0.04,
   defaultOpacity: 0.2,
+  electronColor: 0x7ce7ff,
   initialNucleusMode: 'visibleReference',
+  physicalNucleusRadius: 0.02,
+  visibleReferenceNucleusRadius: 0.3,
+  nucleusColor: 0xffd38a,
   defaultCameraPosition: {
     x: 0,
     y: 0,

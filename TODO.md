@@ -1,10 +1,9 @@
 # Current TODO
 
-## Phase 2 chunk 2
+## Phase 3 chunk 1
 
-* implement `src/renderables/materials.js`
-* implement `src/renderables/createElectronPointCloud.js`
-* implement `src/renderables/createNucleusMarker.js`
-* connect the first sampled cloud and nucleus marker into the app composition
-* add unit and integration coverage for the first visible renderables
+* implement `src/ui/appState.js`
+* implement `src/scene/sceneController.js`
+* enforce the regeneration-versus-visual-update split without adding the full control panel yet
+* add unit and integration coverage for app state and scene-controller behavior
 * verify `npm run check`

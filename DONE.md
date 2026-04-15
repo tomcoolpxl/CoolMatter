@@ -114,3 +114,16 @@ Verified on April 15, 2026:
 * added unit coverage for the landing-page content in `tests/unit/gh-pages-index.test.js`
 * added integration coverage for the GitHub Pages static-hosting contract in `tests/integration/gh-pages-contract.test.js`
 * verified that `npm run check` still passes and that the build emits a standalone static `dist/index.html`
+
+## Phase 2 chunk 2
+
+Verified on April 15, 2026:
+
+* implemented renderable materials in `src/renderables/materials.js`
+* implemented the first electron point-cloud renderable in `src/renderables/createElectronPointCloud.js`
+* implemented the nucleus marker renderable in `src/renderables/createNucleusMarker.js`
+* updated `src/app/createApp.js` to request the validated sampled data and add the first visible cloud and nucleus marker to the scene
+* extended config with electron and nucleus render defaults in `src/app/config.js`
+* added unit coverage for materials and renderables in `tests/unit/renderables.test.js`
+* extended integration coverage for app composition to include sampled data and visible renderables in `tests/integration/app-bootstrap.test.js`
+* verified that `npm run check` still passes after the first visible render integration

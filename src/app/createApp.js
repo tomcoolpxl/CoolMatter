@@ -3,7 +3,12 @@ import { createControls } from '../scene/createControls.js'
 import { createLights } from '../scene/createLights.js'
 import { createRenderer } from '../scene/createRenderer.js'
 import { createScene } from '../scene/createScene.js'
+import { createElectronPointCloud } from '../renderables/createElectronPointCloud.js'
+import { createNucleusMarker } from '../renderables/createNucleusMarker.js'
+import { sampleHydrogenState } from '../sampling/sampleHydrogenState.js'
+import { createSphericalTruncation } from '../sampling/truncation.js'
 import { assert } from '../utils/assert.js'
+import { config } from './config.js'
 
 export function createApp(root) {
   assert(root, 'Expected app root element')
@@ -15,9 +20,17 @@ export function createApp(root) {
   const renderer = createRenderer({ width, height })
   const controls = createControls(camera, renderer.domElement)
   const { ambientLight, directionalLight } = createLights()
+  const initialSample = sampleHydrogenState({
+    stateId: config.initialStateId,
+    sampleCount: config.initialSampleCount,
+    seed: config.defaultSeed,
+    truncation: createSphericalTruncation(config.defaultTruncationRadius),
+  })
+  const electronPointCloud = createElectronPointCloud(initialSample.positions)
+  const nucleusMarker = createNucleusMarker(config.initialNucleusMode)
 
   root.replaceChildren(renderer.domElement)
-  scene.add(ambientLight, directionalLight)
+  scene.add(ambientLight, directionalLight, electronPointCloud, nucleusMarker)
 
   function renderFrame() {
     controls.update()
@@ -36,5 +49,8 @@ export function createApp(root) {
       ambientLight,
       directionalLight,
     },
+    electronPointCloud,
+    nucleusMarker,
+    initialSample,
   }
 }
