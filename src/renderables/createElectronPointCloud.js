@@ -5,7 +5,7 @@ import { createElectronPointMaterial } from './materials.js'
 export function createElectronPointCloud(positions) {
   const geometry = new THREE.BufferGeometry()
 
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage))
 
   const material = createElectronPointMaterial()
   const pointCloud = new THREE.Points(geometry, material)

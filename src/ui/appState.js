@@ -3,7 +3,7 @@ import { createSphericalTruncation } from '../sampling/truncation.js'
 import { assert } from '../utils/assert.js'
 
 const REGENERATION_KEYS = ['superposition', 'sampleCount', 'seed', 'truncation']
-const VISUAL_KEYS = ['pointSize', 'opacity', 'nucleusMode', 'isPlaying', 'timeScale']
+const VISUAL_KEYS = ['pointSize', 'opacity', 'nucleusMode', 'isPlaying', 'timeScale', 'scintillationRate']
 
 export function createAppState() {
   let state = {
@@ -16,6 +16,7 @@ export function createAppState() {
     time: config.initialTime,
     isPlaying: config.initialIsPlaying,
     timeScale: config.initialTimeScale,
+    scintillationRate: config.initialScintillationRate,
     truncation: createSphericalTruncation(config.defaultTruncationRadius),
   }
 
@@ -107,6 +108,12 @@ function sanitizeVisualState(candidateState, previousState) {
       previousState.timeScale,
       -100, // min timeScale
       100, // max timeScale
+    ),
+    scintillationRate: sanitizeFiniteNumber(
+      candidateState.scintillationRate,
+      previousState.scintillationRate,
+      config.minScintillationRate,
+      config.maxScintillationRate,
     ),
   }
 }

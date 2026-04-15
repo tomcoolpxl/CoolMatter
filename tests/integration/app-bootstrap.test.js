@@ -21,6 +21,7 @@ const sceneController = {
   })),
   applyRegenerationUpdate: vi.fn(),
   applyVisualUpdate: vi.fn(),
+  update: vi.fn(),
   resetCamera: vi.fn(),
   destroy: vi.fn(),
 }

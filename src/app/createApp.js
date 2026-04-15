@@ -97,15 +97,18 @@ export function createApp(root) {
     const rawDelta = (currentTime - lastTime) / 1000
     lastTime = currentTime
 
+    let newTime = state.time
+
     if (state.isPlaying) {
-      const delta = rawDelta * state.timeScale
-      const newTime = state.time + delta
+      const physicsDelta = rawDelta * state.timeScale
+      newTime += physicsDelta
       appState.setTime(newTime)
-      sceneController.update(newTime, delta)
       if (controlPanel.updateTimeText) {
         controlPanel.updateTimeText(newTime)
       }
     }
+
+    sceneController.update(newTime, rawDelta)
 
     controls.update()
     renderer.render(scene, camera)

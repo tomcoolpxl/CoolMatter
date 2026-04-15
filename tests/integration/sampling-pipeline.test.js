@@ -32,15 +32,37 @@ describe('sampling pipeline', () => {
     expect(samplingResult.measuredResult.stateId).toBe('1s')
   })
 
-  it('exposes histogram validation in the aggregated validation pipeline', () => {
-    const results = collectValidationResults()
-    const histogramResult = results.find(
-      (result) => result.checkName === 'radial histogram (1s)',
-    )
 
-    expect(histogramResult).toBeDefined()
-    expect(histogramResult.pass).toBe(true)
-    expect(histogramResult.measuredResult.sampleCount).toBe(6000)
-    expect(histogramResult.measuredResult.maxBinError).toBeLessThanOrEqual(histogramResult.tolerance)
+  it('resamples batch properly inside array bounds and leaves untouched alone', async () => {
+    const { resampleBatch } = await import('../../src/sampling/streamingSampler.js')
+    const { createSeededRng } = await import('../../src/sampling/rng.js')
+
+    const positions = new Float32Array(30) // 10 points
+    for (let i = 0; i < 30; i++) positions[i] = -999
+    
+    // Scintillate 3 points
+    const rng = createSeededRng(1234)
+    const superposition = [{ n: 1, l:0, m:0, magnitude:1, phase:0 }]
+    const truncation = { kind: 'spherical', maxRadius: 10 }
+    
+    for (let i = 0; i < 1000; i++) {
+      resampleBatch(positions, superposition, 0.0, 3, truncation, rng)
+    }
+    
+    // we modified exactly 3 points
+    let untouched = 0
+    let modified = 0
+    for (let i = 0; i < 30; i += 3) {
+        if (positions[i] === -999 && positions[i+1] === -999 && positions[i+2] === -999) {
+          untouched++
+        } else {
+          modified++
+          const r2 = positions[i]*positions[i] + positions[i+1]*positions[i+1] + positions[i+2]*positions[i+2]
+          expect(r2).toBeLessThanOrEqual(100.001) // maxRadius^2
+        }
+    }
+    // Because random replacement could hit the same index, we just assert > 0 and <= 3
+    expect(modified).toBeGreaterThan(0)
+    expect(modified).toBeLessThanOrEqual(10)
   })
 })

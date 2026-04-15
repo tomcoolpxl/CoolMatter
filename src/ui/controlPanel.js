@@ -158,6 +158,14 @@ export function createControlPanel({
     max: 1,
     step: 0.01,
   })
+  const scintillationRateInput = createNumberControl(documentRef, {
+    id: 'scintillation-rate-input',
+    labelText: 'Scintillation Rate',
+    value: state.scintillationRate,
+    min: 0,
+    max: 1,
+    step: 0.01,
+  })
   const nucleusModeSelect = createSelectControl(documentRef, {
     id: 'nucleus-mode-select',
     labelText: 'Nucleus mode',
@@ -198,6 +206,9 @@ export function createControlPanel({
   opacityInput.input.addEventListener('input', () => {
     onVisualUpdate({ opacity: Number(opacityInput.input.value) })
   })
+  scintillationRateInput.input.addEventListener('input', () => {
+    onVisualUpdate({ scintillationRate: Number(scintillationRateInput.input.value) })
+  })
   nucleusModeSelect.input.addEventListener('change', () => {
     onVisualUpdate({ nucleusMode: nucleusModeSelect.input.value })
   })
@@ -214,6 +225,7 @@ export function createControlPanel({
     sampleCountInput.field,
     pointSizeInput.field,
     opacityInput.field,
+    scintillationRateInput.field,
     nucleusModeSelect.field,
     seedInput.field,
     controlsHelp,
@@ -237,6 +249,7 @@ export function createControlPanel({
       sampleCountInput: sampleCountInput.input,
       pointSizeInput: pointSizeInput.input,
       opacityInput: opacityInput.input,
+      scintillationRateInput: scintillationRateInput.input,
       nucleusModeSelect: nucleusModeSelect.input,
       seedInput: seedInput.input,
       resetCameraButton,

@@ -14,6 +14,7 @@ describe('app state', () => {
     expect(state.nucleusMode).toBe('physical')
     expect(state.isPlaying).toBe(false)
     expect(state.timeScale).toBe(1.0)
+    expect(state.scintillationRate).toBe(0.05)
     expect(state.time).toBe(0.0)
     expect(state.seed).toBe(12345)
     expect(state.truncation).toEqual({
@@ -48,6 +49,7 @@ describe('app state', () => {
       nucleusMode: 'visibleReference',
       isPlaying: true,
       timeScale: 2.0,
+      scintillationRate: 0.1,
     })
 
     expect(state.pointSize).toBe(0.12)
@@ -55,6 +57,7 @@ describe('app state', () => {
     expect(state.nucleusMode).toBe('visibleReference')
     expect(state.isPlaying).toBe(true)
     expect(state.timeScale).toBe(2.0)
+    expect(state.scintillationRate).toBe(0.1)
     expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(2000000)
     expect(state.seed).toBe(12345)
@@ -86,10 +89,12 @@ describe('app state', () => {
       pointSize: 0,
       opacity: 4,
       nucleusMode: 'invalid',
+      scintillationRate: -1,
     })
 
     expect(state.pointSize).toBe(0.001)
     expect(state.opacity).toBe(1)
+    expect(state.scintillationRate).toBe(0)
     expect(state.nucleusMode).toBe('physical')
   })
 })

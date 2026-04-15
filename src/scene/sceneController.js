@@ -2,6 +2,8 @@ import { config } from '../app/config.js'
 import { createElectronPointCloud } from '../renderables/createElectronPointCloud.js'
 import { createNucleusMarker } from '../renderables/createNucleusMarker.js'
 import { sampleHydrogenState } from '../sampling/sampleHydrogenState.js'
+import { resampleBatch } from '../sampling/streamingSampler.js'
+import { createSeededRng } from '../sampling/rng.js'
 import { disposeObject3D } from '../utils/dispose.js'
 
 export function createSceneController({
@@ -14,6 +16,7 @@ export function createSceneController({
   let currentSample = sampleCurrentState(currentState)
   let currentPointCloud = createElectronPointCloud(currentSample.positions)
   let currentNucleusMarker = createNucleusMarker(currentState.nucleusMode)
+  let streamingRng = createSeededRng(Math.floor(Math.random() * 0xffffffff))
 
   applyPointCloudVisuals(currentPointCloud, currentState)
   scene.add(currentPointCloud, currentNucleusMarker)
@@ -70,7 +73,31 @@ export function createSceneController({
       }
     },
     update(time, delta) {
+      // Delta time is typically in seconds. 
+      // If we are paused, delta used for physics might be zero, or we might skip.
       currentState.time = time
+      
+      const isScintillating = currentState.scintillationRate > 0
+      // Always allow scintillation even if paused, so users can see the point cloud
+      // re-evaluate against the static |Psi|^2 at the frozen t!
+      // But usually time is frozen so the distribution doesn't shift, it just scrambles.
+      if (isScintillating) {
+        // Delta from loop is real wall clock delta (or passed from app.js)
+        const replaceCount = Math.floor(currentState.sampleCount * currentState.scintillationRate * delta)
+        if (replaceCount > 0) {
+          const positions = currentPointCloud.geometry.attributes.position.array
+          resampleBatch(
+            positions,
+            currentState.superposition,
+            currentState.time,
+            replaceCount,
+            currentState.truncation,
+            streamingRng
+          )
+          currentPointCloud.geometry.attributes.position.needsUpdate = true
+        }
+      }
+
       // Scaffolding for when we migrate to ShaderMaterial
       if (currentPointCloud.material.uniforms?.time) {
         currentPointCloud.material.uniforms.time.value = time
