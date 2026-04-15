@@ -6,6 +6,7 @@ import { createScene } from '../scene/createScene.js'
 import { createSceneController } from '../scene/sceneController.js'
 import { assert } from '../utils/assert.js'
 import { createAppState } from '../ui/appState.js'
+import { createControlPanel } from '../ui/controlPanel.js'
 
 export function createApp(root) {
   assert(root, 'Expected app root element')
@@ -24,8 +25,24 @@ export function createApp(root) {
     controls,
     initialState: appState.getState(),
   })
+  const controlPanel = createControlPanel({
+    state: appState.getState(),
+    onRegenerationUpdate(partialState) {
+      const nextState = appState.applyRegenerationUpdate(partialState)
 
-  root.replaceChildren(renderer.domElement)
+      sceneController.applyRegenerationUpdate(nextState)
+    },
+    onVisualUpdate(partialState) {
+      const nextState = appState.applyVisualUpdate(partialState)
+
+      sceneController.applyVisualUpdate(nextState)
+    },
+    onResetCamera() {
+      sceneController.resetCamera()
+    },
+  })
+
+  root.replaceChildren(controlPanel.element, renderer.domElement)
   scene.add(ambientLight, directionalLight)
 
   function renderFrame() {
@@ -43,6 +60,7 @@ export function createApp(root) {
     controls,
     appState,
     sceneController,
+    controlPanel,
     lights: {
       ambientLight,
       directionalLight,

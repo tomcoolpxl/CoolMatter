@@ -139,3 +139,14 @@ Verified on April 15, 2026:
 * added unit coverage for scene-controller replacement and visual-update behavior in `tests/unit/scene-controller.test.js`
 * updated integration coverage in `tests/integration/app-bootstrap.test.js` for the new bootstrap wiring
 * verified that `npm run check` still passes after the Phase 3 architectural split
+
+## Phase 3 chunk 2
+
+Verified on April 15, 2026:
+
+* implemented the plain-DOM control panel in `src/ui/controlPanel.js`
+* updated `src/app/createApp.js` to wire control-panel events through app state and the scene-controller split
+* extended config with explicit supported state IDs for UI option creation in `src/app/config.js`
+* added unit coverage for control-panel event routing in `tests/unit/control-panel.test.js`
+* extended integration coverage in `tests/integration/app-bootstrap.test.js` for control-panel wiring and update dispatch
+* verified that `npm run check` still passes after the full Phase 3 interaction wiring

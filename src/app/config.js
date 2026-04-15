@@ -1,4 +1,5 @@
 export const config = {
+  supportedStateIds: ['1s', '2s'],
   initialStateId: '1s',
   initialSampleCount: 20000,
   defaultSeed: 12345,
