@@ -111,9 +111,10 @@ export function createControlPanel({
   }
 
   const addCompDiv = documentRef.createElement('div')
-  const nInput = createNumberControl(documentRef, { id: 'add-n', labelText: 'n', value: 1, min: 1, step: 1 })
-  const lInput = createNumberControl(documentRef, { id: 'add-l', labelText: 'l', value: 0, min: 0, step: 1 })
-  const mInput = createNumberControl(documentRef, { id: 'add-m', labelText: 'm', value: 0, step: 1 })
+  addCompDiv.className = 'add-component-grid'
+  const nInput = createNumberControl(documentRef, { id: 'add-n', labelText: 'n (size)', value: 1, min: 1, step: 1 })
+  const lInput = createNumberControl(documentRef, { id: 'add-l', labelText: 'l (shape)', value: 0, min: 0, step: 1 })
+  const mInput = createNumberControl(documentRef, { id: 'add-m', labelText: 'm (tilt)', value: 0, step: 1 })
   const addBtn = documentRef.createElement('button')
   addBtn.type = 'button'
   addBtn.textContent = 'Add Component'
