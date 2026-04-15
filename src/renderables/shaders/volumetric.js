@@ -27,7 +27,16 @@ uniform float u_m[4];
 uniform vec2 u_weights[4]; // real and imaginary parts
 
 vec2 intersectAABB(vec3 rayOrigin, vec3 rayDir, vec3 boxMin, vec3 boxMax) {
-    vec3 invDir = 1.0 / (rayDir + vec3(1e-8));
+    // Safely handle division by zero or near-zero without flipping signs!
+    vec3 safeDir = rayDir;
+    if (abs(safeDir.x) < 1e-8) safeDir.x = sign(safeDir.x) * 1e-8;
+    if (safeDir.x == 0.0) safeDir.x = 1e-8;
+    if (abs(safeDir.y) < 1e-8) safeDir.y = sign(safeDir.y) * 1e-8;
+    if (safeDir.y == 0.0) safeDir.y = 1e-8;
+    if (abs(safeDir.z) < 1e-8) safeDir.z = sign(safeDir.z) * 1e-8;
+    if (safeDir.z == 0.0) safeDir.z = 1e-8;
+    
+    vec3 invDir = 1.0 / safeDir;
     vec3 t0 = (boxMin - rayOrigin) * invDir;
     vec3 t1 = (boxMax - rayOrigin) * invDir;
     vec3 tNear = min(t0, t1);
