@@ -4,16 +4,32 @@ const render = vi.fn()
 const rendererDomElement = { tagName: 'CANVAS' }
 const controlsUpdate = vi.fn()
 const sceneAdd = vi.fn()
-const sampleHydrogenState = vi.fn(() => ({
-  positions: new Float32Array([0, 0, 0, 1, 1, 1]),
-  metadata: {
-    stateId: '1s',
-    sampleCount: 2,
+const sceneController = {
+  getCurrentObjects: vi.fn(() => ({
+    pointCloud: { kind: 'points' },
+    nucleusMarker: { kind: 'nucleus' },
+  })),
+  getCurrentSample: vi.fn(() => ({
+    metadata: {
+      stateId: '1s',
+      sampleCount: 2,
+      seed: 12345,
+    },
+  })),
+}
+const createSceneController = vi.fn(() => sceneController)
+const appState = {
+  getState: vi.fn(() => ({
+    selectedStateId: '1s',
+    sampleCount: 20000,
+    pointSize: 0.04,
+    opacity: 0.2,
+    nucleusMode: 'visibleReference',
     seed: 12345,
-  },
-}))
-const electronPointCloud = { kind: 'points' }
-const nucleusMarker = { kind: 'nucleus' }
+    truncation: { kind: 'spherical', maxRadius: 12 },
+  })),
+}
+const createAppState = vi.fn(() => appState)
 
 vi.mock('../../src/scene/createScene.js', () => ({
   createScene: () => ({
@@ -50,16 +66,12 @@ vi.mock('../../src/scene/createLights.js', () => ({
   }),
 }))
 
-vi.mock('../../src/sampling/sampleHydrogenState.js', () => ({
-  sampleHydrogenState,
+vi.mock('../../src/ui/appState.js', () => ({
+  createAppState,
 }))
 
-vi.mock('../../src/renderables/createElectronPointCloud.js', () => ({
-  createElectronPointCloud: vi.fn(() => electronPointCloud),
-}))
-
-vi.mock('../../src/renderables/createNucleusMarker.js', () => ({
-  createNucleusMarker: vi.fn(() => nucleusMarker),
+vi.mock('../../src/scene/sceneController.js', () => ({
+  createSceneController,
 }))
 
 describe('app bootstrap', () => {
@@ -67,7 +79,11 @@ describe('app bootstrap', () => {
     render.mockReset()
     controlsUpdate.mockReset()
     sceneAdd.mockReset()
-    sampleHydrogenState.mockClear()
+    createAppState.mockClear()
+    createSceneController.mockClear()
+    appState.getState.mockClear()
+    sceneController.getCurrentObjects.mockClear()
+    sceneController.getCurrentSample.mockClear()
     global.window = {
       innerWidth: 1280,
       innerHeight: 720,
@@ -89,15 +105,16 @@ describe('app bootstrap', () => {
     expect(render).toHaveBeenCalledOnce()
     expect(controlsUpdate).toHaveBeenCalledOnce()
     expect(window.requestAnimationFrame).toHaveBeenCalledOnce()
-    expect(sampleHydrogenState).toHaveBeenCalledOnce()
+    expect(createAppState).toHaveBeenCalledOnce()
+    expect(createSceneController).toHaveBeenCalledOnce()
     expect(sceneAdd).toHaveBeenCalledWith(
       { type: 'ambient' },
       { type: 'directional' },
-      electronPointCloud,
-      nucleusMarker,
     )
-    expect(app.electronPointCloud).toBe(electronPointCloud)
-    expect(app.nucleusMarker).toBe(nucleusMarker)
+    expect(app.appState).toBe(appState)
+    expect(app.sceneController).toBe(sceneController)
+    expect(app.electronPointCloud).toEqual({ kind: 'points' })
+    expect(app.nucleusMarker).toEqual({ kind: 'nucleus' })
     expect(app.renderer.domElement).toBe(rendererDomElement)
   })
 })

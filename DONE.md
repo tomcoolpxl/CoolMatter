@@ -127,3 +127,15 @@ Verified on April 15, 2026:
 * added unit coverage for materials and renderables in `tests/unit/renderables.test.js`
 * extended integration coverage for app composition to include sampled data and visible renderables in `tests/integration/app-bootstrap.test.js`
 * verified that `npm run check` still passes after the first visible render integration
+
+## Phase 3 chunk 1
+
+Verified on April 15, 2026:
+
+* implemented explicit app state in `src/ui/appState.js`
+* implemented scene-object ownership and the regeneration-versus-visual-update split in `src/scene/sceneController.js`
+* updated `src/app/createApp.js` to delegate viewer object ownership to the scene controller and use app state as the current settings source
+* added unit coverage for app state in `tests/unit/app-state.test.js`
+* added unit coverage for scene-controller replacement and visual-update behavior in `tests/unit/scene-controller.test.js`
+* updated integration coverage in `tests/integration/app-bootstrap.test.js` for the new bootstrap wiring
+* verified that `npm run check` still passes after the Phase 3 architectural split
