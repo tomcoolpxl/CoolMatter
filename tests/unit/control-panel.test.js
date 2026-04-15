@@ -10,16 +10,23 @@ describe('control panel', () => {
     const documentRef = createFakeDocument()
     const panel = createControlPanel({
       state: {
-        selectedStateId: '1s',
+        superposition: [
+          { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }
+        ],
         sampleCount: 20000,
         pointSize: 0.04,
         opacity: 0.2,
         nucleusMode: 'visibleReference',
         seed: 12345,
         truncation: { kind: 'spherical', maxRadius: 12 },
+        isPlaying: false,
+        timeScale: 1.0,
+        time: 0.0
       },
       diagnostics: {
-        selectedStateId: '1s',
+        superposition: [
+          { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }
+        ],
         sampleCount: 20000,
         seed: 12345,
         truncationRadius: 12,
@@ -39,8 +46,6 @@ describe('control panel', () => {
       documentRef,
     })
 
-    panel.controls.stateSelect.value = '2s'
-    panel.controls.stateSelect.dispatch('change')
     panel.controls.sampleCountInput.value = '1500'
     panel.controls.sampleCountInput.dispatch('change')
     panel.controls.pointSizeInput.value = '0.12'
@@ -52,17 +57,29 @@ describe('control panel', () => {
     panel.controls.seedInput.value = '77'
     panel.controls.seedInput.dispatch('change')
     panel.controls.resetCameraButton.dispatch('click')
+    
+    // Test the new superposition mixer and play settings
+    panel.controls.playPauseBtn.dispatch('click')
+    panel.controls.timeScaleInput.value = '2.5'
+    panel.controls.timeScaleInput.dispatch('input')
+    
+    panel.controls.addNInput.value = '2'
+    panel.controls.addLInput.value = '1'
+    panel.controls.addMInput.value = '0'
+    panel.controls.addComponentBtn.dispatch('click')
 
     expect(panel.element.className).toBe('control-panel')
     expect(regenerationUpdates).toEqual([
-      { selectedStateId: '2s' },
       { sampleCount: 1500 },
       { seed: 77 },
+      { superposition: [ { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }, { n: 2, l: 1, m: 0, magnitude: 1, phase: 0 } ]}
     ])
     expect(visualUpdates).toEqual([
       { pointSize: 0.12 },
       { opacity: 0.45 },
       { nucleusMode: 'physical' },
+      { isPlaying: true },
+      { timeScale: 2.5 },
     ])
     expect(resetCamera).toHaveBeenCalledOnce()
     expect(panel.element.children.some((child) => child.textContent === 'Drag to orbit, right-drag or WASD to pan, and scroll to zoom.')).toBe(true)
@@ -71,7 +88,9 @@ describe('control panel', () => {
   it('updates the diagnostics block when asked', () => {
     const panel = createControlPanel({
       state: {
-        selectedStateId: '1s',
+        superposition: [
+          { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }
+        ],
         sampleCount: 20000,
         pointSize: 0.04,
         opacity: 0.2,
@@ -80,7 +99,9 @@ describe('control panel', () => {
         truncation: { kind: 'spherical', maxRadius: 12 },
       },
       diagnostics: {
-        selectedStateId: '1s',
+        superposition: [
+          { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }
+        ],
         sampleCount: 20000,
         seed: 12345,
         truncationRadius: 12,
@@ -97,7 +118,7 @@ describe('control panel', () => {
     })
 
     panel.updateDiagnostics({
-      selectedStateId: '2s',
+      superposition: [ { n: 2, l: 1, m: 0, magnitude: 1, phase: 0 } ],
       sampleCount: 1500,
       seed: 77,
       truncationRadius: 8,
@@ -112,7 +133,7 @@ describe('control panel', () => {
     const diagnosticsValues = diagnosticsSection.children[1].children
 
     expect(diagnosticsSection.className).toBe('diagnostics')
-    expect(diagnosticsValues.some((child) => child.textContent === '2s')).toBe(true)
+    expect(diagnosticsValues.some((child) => child.textContent === '|2,1,0⟩')).toBe(true)
     expect(diagnosticsValues.some((child) => child.textContent === '19')).toBe(true)
   })
 })

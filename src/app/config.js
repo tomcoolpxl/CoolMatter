@@ -1,7 +1,10 @@
 export const config = {
   supportedStateIds: ['1s', '2s'],
   supportedNucleusModes: ['visibleReference', 'physical'],
-  initialStateId: '1s',
+  initialSuperposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
+  initialTime: 0.0,
+  initialIsPlaying: false,
+  initialTimeScale: 1.0,
   initialSampleCount: 20000,
   minSampleCount: 1,
   defaultSeed: 12345,

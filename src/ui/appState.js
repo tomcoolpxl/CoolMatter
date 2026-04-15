@@ -2,23 +2,31 @@ import { config } from '../app/config.js'
 import { createSphericalTruncation } from '../sampling/truncation.js'
 import { assert } from '../utils/assert.js'
 
-const REGENERATION_KEYS = ['selectedStateId', 'sampleCount', 'seed', 'truncation']
-const VISUAL_KEYS = ['pointSize', 'opacity', 'nucleusMode']
+const REGENERATION_KEYS = ['superposition', 'sampleCount', 'seed', 'truncation']
+const VISUAL_KEYS = ['pointSize', 'opacity', 'nucleusMode', 'isPlaying', 'timeScale']
 
 export function createAppState() {
   let state = {
-    selectedStateId: config.initialStateId,
+    superposition: [...config.initialSuperposition],
     sampleCount: config.initialSampleCount,
     pointSize: config.defaultPointSize,
     opacity: config.defaultOpacity,
     nucleusMode: config.initialNucleusMode,
     seed: config.defaultSeed,
+    time: config.initialTime,
+    isPlaying: config.initialIsPlaying,
+    timeScale: config.initialTimeScale,
     truncation: createSphericalTruncation(config.defaultTruncationRadius),
   }
 
   return {
     getState() {
       return cloneState(state)
+    },
+    setTime(time) {
+      if (Number.isFinite(time)) {
+        state.time = time
+      }
     },
     applyRegenerationUpdate(partialState) {
       assertAllowedKeys(partialState, REGENERATION_KEYS, 'regeneration')
@@ -54,6 +62,7 @@ function assertAllowedKeys(partialState, allowedKeys, updateKind) {
 function cloneState(state) {
   return {
     ...state,
+    superposition: state.superposition.map((comp) => ({ ...comp })),
     truncation: { ...state.truncation },
   }
 }
@@ -61,7 +70,7 @@ function cloneState(state) {
 function sanitizeRegenerationState(candidateState, previousState) {
   return {
     ...candidateState,
-    selectedStateId: sanitizeStateId(candidateState.selectedStateId, previousState.selectedStateId),
+    superposition: sanitizeSuperposition(candidateState.superposition, previousState.superposition),
     sampleCount: sanitizeInteger(
       candidateState.sampleCount,
       previousState.sampleCount,
@@ -92,11 +101,38 @@ function sanitizeVisualState(candidateState, previousState) {
       config.maxOpacity,
     ),
     nucleusMode: sanitizeNucleusMode(candidateState.nucleusMode, previousState.nucleusMode),
+    isPlaying: Boolean(candidateState.isPlaying ?? previousState.isPlaying),
+    timeScale: sanitizeFiniteNumber(
+      candidateState.timeScale,
+      previousState.timeScale,
+      -100, // min timeScale
+      100, // max timeScale
+    ),
   }
 }
 
-function sanitizeStateId(value, fallback) {
-  return config.supportedStateIds.includes(value) ? value : fallback
+function sanitizeSuperposition(value, fallback) {
+  if (!Array.isArray(value)) {
+    return fallback
+  }
+  const valid = value.filter(comp => 
+    typeof comp === 'object' && comp !== null &&
+    Number.isInteger(comp.n) && comp.n >= 1 &&
+    Number.isInteger(comp.l) && comp.l >= 0 && comp.l < comp.n &&
+    Number.isInteger(comp.m) && Math.abs(comp.m) <= comp.l &&
+    Number.isFinite(comp.magnitude) && comp.magnitude >= 0 &&
+    Number.isFinite(comp.phase)
+  )
+  if (valid.length === 0) return fallback
+
+  // Normalize
+  let sumSq = 0
+  for (const comp of valid) sumSq += comp.magnitude * comp.magnitude
+  if (sumSq > 0) {
+    const invNorm = 1.0 / Math.sqrt(sumSq)
+    for (const comp of valid) comp.magnitude *= invNorm
+  }
+  return valid
 }
 
 function sanitizeNucleusMode(value, fallback) {

@@ -53,13 +53,13 @@ function checkDefaultTruncationDescription() {
 function checkDeterministicSamplingSummary() {
   const truncation = createSphericalTruncation()
   const sampleA = sampleHydrogenState({
-    stateId: config.initialStateId,
+    stateId: '1s',
     sampleCount: 4,
     seed: config.defaultSeed,
     truncation,
   })
   const sampleB = sampleHydrogenState({
-    stateId: config.initialStateId,
+    stateId: '1s',
     sampleCount: 4,
     seed: config.defaultSeed,
     truncation,

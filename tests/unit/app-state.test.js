@@ -7,11 +7,14 @@ describe('app state', () => {
     const appState = createAppState()
     const state = appState.getState()
 
-    expect(state.selectedStateId).toBe('1s')
+    expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(20000)
     expect(state.pointSize).toBe(0.04)
     expect(state.opacity).toBe(0.2)
     expect(state.nucleusMode).toBe('visibleReference')
+    expect(state.isPlaying).toBe(false)
+    expect(state.timeScale).toBe(1.0)
+    expect(state.time).toBe(0.0)
     expect(state.seed).toBe(12345)
     expect(state.truncation).toEqual({
       kind: 'spherical',
@@ -23,12 +26,12 @@ describe('app state', () => {
     const appState = createAppState()
 
     const state = appState.applyRegenerationUpdate({
-      selectedStateId: '2s',
+      superposition: [{ n: 2, l: 0, m: 0, magnitude: 1, phase: 0 }],
       sampleCount: 1500,
       seed: 99,
     })
 
-    expect(state.selectedStateId).toBe('2s')
+    expect(state.superposition).toEqual([{ n: 2, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(1500)
     expect(state.seed).toBe(99)
     expect(state.pointSize).toBe(0.04)
@@ -43,12 +46,16 @@ describe('app state', () => {
       pointSize: 0.12,
       opacity: 0.45,
       nucleusMode: 'physical',
+      isPlaying: true,
+      timeScale: 2.0,
     })
 
     expect(state.pointSize).toBe(0.12)
     expect(state.opacity).toBe(0.45)
     expect(state.nucleusMode).toBe('physical')
-    expect(state.selectedStateId).toBe('1s')
+    expect(state.isPlaying).toBe(true)
+    expect(state.timeScale).toBe(2.0)
+    expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(20000)
     expect(state.seed).toBe(12345)
   })
@@ -57,13 +64,13 @@ describe('app state', () => {
     const appState = createAppState()
 
     const state = appState.applyRegenerationUpdate({
-      selectedStateId: 'bogus',
+      superposition: 'bogus',
       sampleCount: Number.NaN,
       seed: -7,
       truncation: { kind: 'spherical', maxRadius: 0 },
     })
 
-    expect(state.selectedStateId).toBe('1s')
+    expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(20000)
     expect(state.seed).toBe(0)
     expect(state.truncation).toEqual({

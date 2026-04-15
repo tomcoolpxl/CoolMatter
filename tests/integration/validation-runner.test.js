@@ -10,7 +10,7 @@ describe('validation runner', () => {
   it('executes the full scientific validation pipeline successfully', () => {
     const results = collectValidationResults()
 
-    expect(results).toHaveLength(18)
+    expect(results).toHaveLength(19)
     expect(results.every((result) => result.pass)).toBe(true)
 
     const normalization2s = results.find(

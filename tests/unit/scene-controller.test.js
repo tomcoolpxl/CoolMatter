@@ -56,7 +56,7 @@ describe('scene controller', () => {
       camera,
       controls,
       initialState: {
-        selectedStateId: '1s',
+        superposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
         sampleCount: 1,
         pointSize: 0.1,
         opacity: 0.25,
@@ -100,7 +100,7 @@ describe('scene controller', () => {
       camera,
       controls,
       initialState: {
-        selectedStateId: '1s',
+        superposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
         sampleCount: 1,
         pointSize: 0.1,
         opacity: 0.25,
@@ -111,7 +111,7 @@ describe('scene controller', () => {
     })
 
     controller.applyRegenerationUpdate({
-      selectedStateId: '2s',
+      superposition: [{ n: 2, l: 0, m: 0, magnitude: 1, phase: 0 }],
       sampleCount: 2,
       pointSize: 0.2,
       opacity: 0.5,
@@ -155,7 +155,7 @@ describe('scene controller', () => {
       camera,
       controls,
       initialState: {
-        selectedStateId: '1s',
+        superposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
         sampleCount: 1,
         pointSize: 0.1,
         opacity: 0.25,
@@ -166,7 +166,7 @@ describe('scene controller', () => {
     })
 
     controller.applyVisualUpdate({
-      selectedStateId: '1s',
+      superposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
       sampleCount: 1,
       pointSize: 0.33,
       opacity: 0.66,
@@ -212,7 +212,7 @@ describe('scene controller', () => {
       camera,
       controls,
       initialState: {
-        selectedStateId: '1s',
+        superposition: [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }],
         sampleCount: 1,
         pointSize: 0.1,
         opacity: 0.25,

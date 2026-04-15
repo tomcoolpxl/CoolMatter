@@ -1,4 +1,6 @@
-import { config } from '../app/config.js'
+const fs = require('fs');
+
+const controlPanelSource = `import { config } from '../app/config.js'
 
 export function createControlPanel({
   state,
@@ -31,7 +33,7 @@ export function createControlPanel({
 
   const timeReadout = documentRef.createElement('p')
   timeReadout.className = 'time-readout'
-  timeReadout.textContent = `Time: ${(state.time ?? 0).toFixed(2)}`
+  timeReadout.textContent = \`Time: \${(state.time ?? 0).toFixed(2)}\`
 
   playbackSection.append(playbackHeading, playPauseBtn, timeScaleInput.field, timeReadout)
 
@@ -58,7 +60,6 @@ export function createControlPanel({
   function renderSuperpositionList() {
     componentsList.replaceChildren()
     
-    // Auto-Normalization logic
     const sumSq = currentSuperposition.reduce((sum, c) => sum + c.magnitude * c.magnitude, 0)
     
     currentSuperposition.forEach((comp, i) => {
@@ -68,10 +69,10 @@ export function createControlPanel({
       const pct = (normMag * normMag * 100).toFixed(1)
       
       const label = documentRef.createElement('div')
-      label.textContent = `|${comp.n}, ${comp.l}, ${comp.m}⟩ (${pct}%)`
+      label.textContent = \`|\${comp.n}, \${comp.l}, \${comp.m}⟩ (\${pct}%)\`
       
       const magSlider = createNumberControl(documentRef, {
-        id: `mag-${i}`,
+        id: \`mag-\${i}\`,
         labelText: 'Mag',
         value: comp.magnitude,
         min: 0,
@@ -79,7 +80,7 @@ export function createControlPanel({
         step: 0.01
       })
       const phaseSlider = createNumberControl(documentRef, {
-        id: `phase-${i}`,
+        id: \`phase-\${i}\`,
         labelText: 'Phase',
         value: comp.phase,
         min: 0,
@@ -244,24 +245,25 @@ export function createControlPanel({
       updateDiagnostics(diagnosticsBody, nextDiagnostics, documentRef)
     },
     updateTimeText(time) {
-      timeReadout.textContent = `Time: ${time.toFixed(2)}`
+      timeReadout.textContent = \`Time: \${time.toFixed(2)}\`
     }
   }
 }
 
 function updateDiagnostics(container, diagnostics, documentRef) {
+  // Use superposition formatting if diagnostics has it, else selectedStateId
   const stateStr = diagnostics.superposition 
-    ? diagnostics.superposition.map(s => `|${s.n},${s.l},${s.m}⟩`).join(' + ')
+    ? diagnostics.superposition.map(s => \`|\${s.n},\${s.l},\${s.m}⟩\`).join(' + ')
     : diagnostics.selectedStateId || ''
     
   container.replaceChildren(
     ...createDiagnosticsEntries(documentRef, [
-      ['State(s)', stateStr],
+      ['State', stateStr],
       ['Sample count', String(diagnostics.sampleCount)],
       ['Seed', String(diagnostics.seed)],
       ['Truncation radius', String(diagnostics.truncationRadius)],
       ['Last sample attempts', String(diagnostics.latestSampleAttemptCount)],
-      ['Validation', `${diagnostics.validationStatus} (${diagnostics.validationCheckCount} checks)`],
+      ['Validation', \`\${diagnostics.validationStatus} (\${diagnostics.validationCheckCount} checks)\`],
       ['Validation command', diagnostics.validationCommand],
     ]),
   )
@@ -332,3 +334,6 @@ function createSelectControl(documentRef, {
 
   return { field, input }
 }
+`;
+
+fs.writeFileSync('src/ui/controlPanel.js', controlPanelSource);

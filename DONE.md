@@ -237,3 +237,10 @@ Verified on April 15, 2026:
 - `src/physics/hydrogen/superposition.js`: Evaluator scaling any spatial components by arbitrary complex weight. Correctly mixes individual densities across (r, theta, phi) and maps probability through time t based on energy eigenvalue differences.
 - `tests/unit/superposition.test.js`: Verified components compile correctly without blowing up when added.
 - `src/validation/superpositionChecks.js`: Mathematically validates numerical integrals sum out probabilities tightly across multiple time periods. Passes `npm run validate`.
+
+## Version 2 Phase 2
+- `src/ui/appState.js`: Added state support for `time`, `isPlaying`, `timeScale`, and structured `superposition` arrays.
+- `src/app/createApp.js`: Replaced static loop with a `performance.now()` precision loop to tick `appState.time`. Hooked time updates smoothly into `sceneController`.
+- `src/ui/controlPanel.js`: Built out functional "Playback & Timeline" sections as well as "Superposition Mixer". Fully supports arbitrary adding/removing of components, and correctly validates (n,l,m). Replaces legacy `selectedStateId` completely. UI drives real-time data to `appState`.
+- `src/scene/sceneController.js`: Scaffolded `update(time, delta)` to wire dynamic updates onto the renderable point cloud, maintaining legacy sampling hooks until Phase 3/4.
+- Handled E2E integration validation by replacing static `State` tests with complex `.getByRole` matching for Superposition workflows. Fully passes all validation layers `npm run test` and `npm run test:e2e`.

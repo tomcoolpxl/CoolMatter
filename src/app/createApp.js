@@ -33,12 +33,12 @@ export function createApp(root) {
     const sample = sceneController.getCurrentSample()
 
     return {
-      selectedStateId: state.selectedStateId,
+      superposition: state.superposition,
       sampleCount: state.sampleCount,
       seed: state.seed,
       truncationRadius: state.truncation.maxRadius,
-      latestSampleStateId: sample.metadata.stateId,
-      latestSampleAttemptCount: sample.metadata.attemptCount,
+      latestSampleStateId: sample.metadata?.stateId || 'mix',
+      latestSampleAttemptCount: sample.metadata?.attemptCount || 0,
       validationStatus: validationSummary.statusText,
       validationCheckCount: validationSummary.expectedCheckCount,
       validationCommand: validationSummary.command,
@@ -85,10 +85,26 @@ export function createApp(root) {
 
   let animationFrameId = null
   let isDestroyed = false
+  let lastTime = performance.now()
 
-  function renderFrame() {
+  function renderFrame(currentTime) {
     if (isDestroyed) {
       return
+    }
+
+    const state = appState.getState()
+    // Calculate raw delta in seconds
+    const rawDelta = (currentTime - lastTime) / 1000
+    lastTime = currentTime
+
+    if (state.isPlaying) {
+      const delta = rawDelta * state.timeScale
+      const newTime = state.time + delta
+      appState.setTime(newTime)
+      sceneController.update(newTime, delta)
+      if (controlPanel.updateTimeText) {
+        controlPanel.updateTimeText(newTime)
+      }
     }
 
     controls.update()
@@ -96,7 +112,7 @@ export function createApp(root) {
     animationFrameId = window.requestAnimationFrame(renderFrame)
   }
 
-  renderFrame()
+  renderFrame(performance.now())
 
   return {
     scene,

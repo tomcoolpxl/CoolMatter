@@ -191,7 +191,7 @@ describe('app bootstrap', () => {
     expect(createSceneController).toHaveBeenCalledOnce()
     expect(createControlPanel).toHaveBeenCalledOnce()
     expect(window.addEventListener).toHaveBeenCalledWith('resize', app.handleResize)
-    expect(createControlPanel.mock.calls[0][0].diagnostics.validationCheckCount).toBe(18)
+    expect(createControlPanel.mock.calls[0][0].diagnostics.validationCheckCount).toBe(19)
     expect(sceneAdd).toHaveBeenCalledWith(
       { type: 'ambient' },
       { type: 'directional' },

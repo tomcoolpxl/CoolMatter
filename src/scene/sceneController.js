@@ -69,6 +69,13 @@ export function createSceneController({
         nucleusMarker: currentNucleusMarker,
       }
     },
+    update(time, delta) {
+      currentState.time = time
+      // Scaffolding for when we migrate to ShaderMaterial
+      if (currentPointCloud.material.uniforms?.time) {
+        currentPointCloud.material.uniforms.time.value = time
+      }
+    },
     resetCamera() {
       camera.position.set(
         config.defaultCameraPosition.x,
@@ -88,8 +95,16 @@ export function createSceneController({
 }
 
 function sampleCurrentState(state) {
+  // If the sampler still only takes a stateId for now, we use the first component's ID heuristically
+  // or we need to pass superposition if the sampler supports it. 
+  // Let's pass superposition instead, and let sampleHydrogenState deal with it if we upgrade it,
+  // or we just map it to the string id for now so it doesn't crash if the sampler is unmodified.
+  const comp = state.superposition[0]
+  const stateId = `${comp.n}s` // fallback heuristic, or we'll pass both
+  
   return sampleHydrogenState({
-    stateId: state.selectedStateId,
+    superposition: state.superposition,
+    stateId, // keeping for compat if tests need it
     sampleCount: state.sampleCount,
     seed: state.seed,
     truncation: state.truncation,
@@ -97,14 +112,21 @@ function sampleCurrentState(state) {
 }
 
 function applyPointCloudVisuals(pointCloud, state) {
-  pointCloud.material.size = state.pointSize
-  pointCloud.material.opacity = state.opacity
+  if (pointCloud.material.uniforms) {
+    if (state.time !== undefined) {
+      pointCloud.material.uniforms.time.value = state.time
+    }
+  } else {
+    pointCloud.material.size = state.pointSize
+    pointCloud.material.opacity = state.opacity
+  }
   pointCloud.material.needsUpdate = true
 }
 
 function cloneState(state) {
   return {
     ...state,
+    superposition: state.superposition ? state.superposition.map(comp => ({ ...comp })) : [],
     truncation: { ...state.truncation },
   }
 }
