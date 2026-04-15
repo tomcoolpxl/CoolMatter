@@ -23,6 +23,11 @@ Project rules:
 - For narrow tasks, pass the exact authoritative files in the prompt instead of retyping context.
 - Ask before making a large refactor, changing the directory structure, or removing tests.
 - Before moving work to `DONE.md`, review the diff, run the required checks, and update docs if the change affected scope or structure.
+- Use the standard npm entrypoints in `package.json` instead of ad hoc commands:
+  `npm run dev` or `npm start` for local development,
+  `npm run test` for pure-Node validation,
+  `npm run build` for production build verification,
+  `npm run check` to run the standard verification pass before marking work done.
 
 ## 1. Think Before Coding
 
