@@ -3,10 +3,467 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="CoolMatter is a physics-driven browser project for exploring hydrogen stationary states through explicit probability-density sampling."
+    />
     <title>CoolMatter</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #020409;
+        --bg-soft: #0b1220;
+        --panel: rgba(10, 16, 28, 0.82);
+        --line: rgba(151, 169, 197, 0.18);
+        --text: #edf3ff;
+        --muted: #97a9c5;
+        --accent: #7ce7ff;
+        --accent-strong: #2cb7d9;
+        --warm: #ffd38a;
+        --shadow: 0 32px 90px rgba(0, 0, 0, 0.42);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(44, 183, 217, 0.18), transparent 26rem),
+          radial-gradient(circle at 80% 18%, rgba(255, 211, 138, 0.12), transparent 18rem),
+          linear-gradient(180deg, #050912 0%, var(--bg) 52%, #04070d 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(circle, rgba(255, 255, 255, 0.22) 0 1px, transparent 1.5px);
+        background-size: 36px 36px;
+        opacity: 0.18;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        width: min(1120px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+      }
+
+      .masthead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0 2rem;
+      }
+
+      .brand {
+        letter-spacing: 0.28rem;
+        text-transform: uppercase;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .nav a {
+        text-decoration: none;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+        gap: 2rem;
+        align-items: center;
+        padding: 2rem 0 3rem;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.35rem 0.8rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(8, 12, 22, 0.72);
+        color: var(--warm);
+        font-size: 0.86rem;
+        letter-spacing: 0.06rem;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 18px rgba(124, 231, 255, 0.65);
+      }
+
+      h1 {
+        margin: 1rem 0 1rem;
+        font-size: clamp(2.8rem, 7vw, 5.9rem);
+        line-height: 0.92;
+        letter-spacing: -0.07rem;
+      }
+
+      .hero p {
+        max-width: 42rem;
+        margin: 0 0 1.4rem;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.7rem;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        min-width: 12rem;
+        padding: 0.95rem 1.35rem;
+        border-radius: 999px;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .button-primary {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        color: #041018;
+        font-weight: 700;
+      }
+
+      .button-secondary {
+        border-color: var(--line);
+        background: rgba(8, 12, 22, 0.62);
+        color: var(--text);
+      }
+
+      .orbital-card {
+        position: relative;
+        padding: 1.5rem;
+        border: 1px solid var(--line);
+        border-radius: 2rem;
+        background:
+          radial-gradient(circle at center, rgba(124, 231, 255, 0.16), transparent 48%),
+          linear-gradient(180deg, rgba(9, 14, 24, 0.94), rgba(6, 10, 18, 0.88));
+        box-shadow: var(--shadow);
+        min-height: 420px;
+        overflow: hidden;
+      }
+
+      .orbital-card::after {
+        content: "";
+        position: absolute;
+        inset: 1rem;
+        border: 1px solid rgba(124, 231, 255, 0.08);
+        border-radius: 1.5rem;
+      }
+
+      .diagram {
+        position: relative;
+        height: 100%;
+        min-height: 360px;
+      }
+
+      .diagram-ring,
+      .diagram-node,
+      .diagram-core,
+      .diagram-cloud {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+      }
+
+      .diagram-core {
+        width: 1rem;
+        height: 1rem;
+        background: var(--warm);
+        box-shadow: 0 0 30px rgba(255, 211, 138, 0.85);
+      }
+
+      .diagram-ring {
+        border: 1px solid rgba(124, 231, 255, 0.22);
+      }
+
+      .ring-1 {
+        width: 7rem;
+        height: 7rem;
+      }
+
+      .ring-2 {
+        width: 13rem;
+        height: 13rem;
+      }
+
+      .ring-3 {
+        width: 19rem;
+        height: 19rem;
+        border-style: dashed;
+      }
+
+      .diagram-node {
+        width: 13rem;
+        height: 13rem;
+        border: 1px dashed rgba(255, 211, 138, 0.36);
+      }
+
+      .diagram-cloud {
+        width: 17rem;
+        height: 17rem;
+        background:
+          radial-gradient(circle at 30% 35%, rgba(124, 231, 255, 0.4), transparent 16%),
+          radial-gradient(circle at 67% 42%, rgba(124, 231, 255, 0.26), transparent 12%),
+          radial-gradient(circle at 45% 68%, rgba(124, 231, 255, 0.24), transparent 14%),
+          radial-gradient(circle at center, rgba(124, 231, 255, 0.22), transparent 56%);
+        filter: blur(0.4px);
+        opacity: 0.9;
+      }
+
+      .diagram-labels {
+        position: absolute;
+        inset: auto 0 0;
+        display: grid;
+        gap: 0.7rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .section {
+        margin-top: 2rem;
+        padding: 1.7rem;
+        border: 1px solid var(--line);
+        border-radius: 1.6rem;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .section h2 {
+        margin: 0 0 1rem;
+        font-size: 1.5rem;
+      }
+
+      .section p,
+      .section li {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .panel {
+        padding: 1.2rem;
+        border: 1px solid var(--line);
+        border-radius: 1.2rem;
+        background: rgba(6, 10, 18, 0.78);
+      }
+
+      .panel h3 {
+        margin: 0 0 0.6rem;
+        font-size: 1.08rem;
+      }
+
+      .panel code {
+        color: var(--warm);
+      }
+
+      .footnote {
+        margin-top: 1.2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 920px) {
+        .hero,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .masthead {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .orbital-card {
+          min-height: 360px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          width: min(100% - 1rem, 1120px);
+        }
+
+        .section,
+        .orbital-card {
+          border-radius: 1.25rem;
+        }
+
+        h1 {
+          font-size: clamp(2.4rem, 14vw, 4.3rem);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <div class="page">
+      <header class="masthead">
+        <div class="brand">CoolMatter</div>
+        <nav class="nav" aria-label="Page">
+          <a href="#overview">Overview</a>
+          <a href="#model">Model</a>
+          <a href="#scope">Version 1</a>
+          <a href="#hosting">GitHub Pages</a>
+        </nav>
+      </header>
+
+      <section class="hero" id="overview">
+        <div>
+          <div class="eyebrow">Hydrogen Stationary States</div>
+          <h1>Make the orbital explicit before you make it beautiful.</h1>
+          <p>
+            CoolMatter is a browser-based exploration project for hydrogen stationary states.
+            Its visual output is tied to a defined quantum-mechanical model instead of decorative particle effects.
+          </p>
+          <p>
+            The first implementation stays deliberately narrow: <code>1s</code> and <code>2s</code>,
+            a fixed nucleus at the origin, Monte Carlo samples drawn from <code>|psi|^2</code>,
+            and validation that runs independently of the viewer.
+          </p>
+          <div class="cta-row">
+            <a class="button button-primary" href="#model">See the Model</a>
+            <a class="button button-secondary" href="#hosting">Use on GitHub Pages</a>
+          </div>
+        </div>
+
+        <aside class="orbital-card" aria-label="Hydrogen orbital concept illustration">
+          <div class="diagram">
+            <div class="diagram-cloud"></div>
+            <div class="diagram-ring ring-1"></div>
+            <div class="diagram-ring ring-2"></div>
+            <div class="diagram-ring ring-3"></div>
+            <div class="diagram-node"></div>
+            <div class="diagram-core"></div>
+            <div class="diagram-labels">
+              <div><strong>Authoritative quantity:</strong> spatial probability density <code>rho(x, y, z) = |psi_nlm|^2</code></div>
+              <div><strong>Display method:</strong> sampled detection outcomes derived from the same density</div>
+              <div><strong>Internal length unit:</strong> Bohr radius <code>a0</code></div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="model">
+        <h2>Scientific posture</h2>
+        <div class="grid">
+          <article class="panel">
+            <h3>What the code models</h3>
+            <p>
+              Version 1 uses the standard nonrelativistic Schrödinger model for bound hydrogen states with a fixed nucleus,
+              no external fields, and stationary eigenstates only.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>What the viewer shows</h3>
+            <p>
+              The viewer renders Monte Carlo point samples drawn from <code>|psi|^2</code>.
+              It does not claim to show a literal glowing cloud of matter.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>Why validation matters</h3>
+            <p>
+              Normalization, node structure, deterministic sampling, and radial histogram checks exist so the viewer stays downstream of the physics instead of replacing it.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="scope">
+        <h2>Version 1 scope</h2>
+        <div class="grid">
+          <article class="panel">
+            <h3>Included</h3>
+            <p><code>1s</code> and <code>2s</code> states, a black scene, orbit controls, a nucleus marker, and sampled electron positions derived from explicit formulas.</p>
+          </article>
+          <article class="panel">
+            <h3>Explicitly excluded</h3>
+            <p>No proton internals, no arbitrary fog volumes, no unsupported time dependence, and no hand-authored orbital geometry.</p>
+          </article>
+          <article class="panel">
+            <h3>Later extensions</h3>
+            <p><code>2p</code> states, scalar fields, isosurfaces, improved diagnostics, and more advanced rendering modes can be layered on the same model.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="hosting">
+        <h2>GitHub Pages contract</h2>
+        <p>
+          This landing page is intentionally self-contained so GitHub Pages can serve it directly as a static site.
+          It does not depend on the Vite runtime entry script, external assets, or a repository-specific deployment adapter.
+        </p>
+        <div class="grid">
+          <article class="panel">
+            <h3>Static by design</h3>
+            <p>The page uses inline HTML and CSS only, which makes the default GitHub Pages publishing path straightforward.</p>
+          </article>
+          <article class="panel">
+            <h3>Project messaging</h3>
+            <p>The content explains the scientific scope, the rendering semantics, and the deliberate constraints of version 1.</p>
+          </article>
+          <article class="panel">
+            <h3>Repo adaptation</h3>
+            <p>You can still adapt the repository structure or deployment wiring yourself later without needing to rewrite the page copy first.</p>
+          </article>
+        </div>
+        <p class="footnote">
+          CoolMatter is a small experiment in making the meaning of a visualized hydrogen orbital clear enough that the implementation can be inspected, challenged, and extended without losing the physics.
+        </p>
+      </section>
+    </div>
   </body>
 </html>

@@ -35,6 +35,8 @@ Project rules:
   Do not assume the result should be `1` unless the domain is actually untruncated.
 - Every implementation phase or chunk must add or update both unit and integration tests for the behavior introduced in that chunk.
 - New implementation work is not complete until it is covered by unit and integration tests and `npm run check` passes.
+- If a build emits a non-blocking optimization warning, document the follow-up plan in the phase docs or hardening plan instead of quietly dropping it.
+  Keep the current chunk narrow unless the optimization is required for correctness.
 
 ## 1. Think Before Coding
 

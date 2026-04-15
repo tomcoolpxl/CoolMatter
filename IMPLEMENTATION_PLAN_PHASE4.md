@@ -49,6 +49,7 @@ Phase 4 includes:
 4. manual reproducibility verification
 5. rerunning validation after full integration
 6. final review against version 1 acceptance criteria
+7. review and address deferred build-size optimization warnings if they still matter after version 1 integration
 
 Phase 4 does not include:
 
@@ -56,6 +57,12 @@ Phase 4 does not include:
 * new rendering modes
 * UI redesign
 * performance tuning beyond obvious correctness and leak issues
+
+Current deferred optimization note:
+
+* after Phase 2 chunk 1, Vite reported a large client chunk warning once Three.js scene infrastructure was added
+* this is not currently blocking correctness, but Phase 4 should explicitly review whether the warning still exists
+* preferred options are to keep the first pass simple, then evaluate either manual chunking, selective dynamic imports, or accepting the warning if the version 1 scope remains intentionally small
 
 ## Target file set
 

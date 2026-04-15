@@ -11,5 +11,9 @@ export const config = {
     y: 0,
     z: 16,
   },
+  cameraFovDegrees: 45,
+  cameraNear: 0.1,
+  cameraFar: 200,
+  sceneBackgroundColor: 0x000000,
   rendererAntialias: true,
 }

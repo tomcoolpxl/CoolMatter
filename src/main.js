@@ -1,4 +1,4 @@
-import { config } from './app/config.js'
+import { createApp } from './app/createApp.js'
 
 const app = document.querySelector('#app')
 
@@ -6,10 +6,4 @@ if (!app) {
   throw new Error('Expected #app root element')
 }
 
-app.innerHTML = `
-  <main>
-    <h1>CoolMatter</h1>
-    <p>Phase 1 scientific foundation in progress.</p>
-    <p>Initial state: ${config.initialStateId}</p>
-  </main>
-`
+createApp(app)

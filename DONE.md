@@ -91,3 +91,26 @@ Verified on April 15, 2026:
 * added integration coverage for histogram results in `tests/integration/sampling-pipeline.test.js`
 * updated the aggregated validation integration expectation in `tests/integration/validation-runner.test.js`
 * verified the standard verification pass with `npm run check`
+
+## Phase 2 chunk 1
+
+Verified on April 15, 2026:
+
+* implemented the scene shell in `src/scene/createScene.js`, `src/scene/createCamera.js`, `src/scene/createRenderer.js`, `src/scene/createControls.js`, and `src/scene/createLights.js`
+* added the minimal browser bootstrap in `src/app/createApp.js`
+* updated `src/main.js` to launch the scene shell instead of the Phase 1 placeholder
+* extended config with the scene background and camera projection defaults in `src/app/config.js`
+* added unit coverage for the scene factories in `tests/unit/scene-shell.test.js`
+* added integration coverage for app bootstrap composition in `tests/integration/app-bootstrap.test.js`
+* documented the non-blocking Vite chunk-size warning as a deferred optimization review for Phase 4
+* verified that `npm run check` still passes after rendering integration
+
+## Maintenance
+
+Verified on April 15, 2026:
+
+* replaced `index.html` with a self-contained GitHub Pages landing page that does not depend on `/src/main.js`
+* crafted the page so GitHub Pages can serve it directly as a static site with inline HTML and CSS only
+* added unit coverage for the landing-page content in `tests/unit/gh-pages-index.test.js`
+* added integration coverage for the GitHub Pages static-hosting contract in `tests/integration/gh-pages-contract.test.js`
+* verified that `npm run check` still passes and that the build emits a standalone static `dist/index.html`
