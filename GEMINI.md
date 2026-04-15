@@ -27,14 +27,26 @@ Project rules:
   `npm run dev` or `npm start` for local development,
   `npm run test:unit` for unit tests,
   `npm run test:integration` for integration tests,
+  `npm run test:e2e` for Playwright end-to-end tests,
   `npm run test` for the full test suite,
   `npm run validate` for the pure-Node scientific validation script,
   `npm run build` for production build verification,
   `npm run check` to run the standard verification pass before marking work done.
+- Playwright setup is part of the repository contract:
+  keep `playwright.config.js` as the authoritative e2e config,
+  use `npm run preview:e2e` as the local preview server command for browser tests,
+  and install the required browser with `npx playwright install chromium` when setting up a fresh environment.
 - For normalization checks over a finite radial cutoff, compare the numerical integral to the expected truncated probability mass for that state and cutoff.
   Do not assume the result should be `1` unless the domain is actually untruncated.
-- Every implementation phase or chunk must add or update both unit and integration tests for the behavior introduced in that chunk.
-- New implementation work is not complete until it is covered by unit and integration tests and `npm run check` passes.
+- Every implementation phase or chunk must add or update both unit and integration tests for the behavior introduced in that chunk, and add or extend Playwright coverage when the browser-facing flow changes.
+- Browser-facing changes include, at minimum:
+  app bootstrap changes,
+  rendered scene composition changes,
+  control-panel behavior changes,
+  GitHub Pages hosting changes,
+  and any workflow that changes what a user can do or see in the browser.
+- New implementation work is not complete until the relevant automated coverage is in place and `npm run check` passes.
+- If `npm run test:e2e` cannot run in the current environment because a local server bind or browser launch is restricted, document that clearly and rerun it in an environment where Playwright is allowed before treating the work as fully verified.
 - If a build emits a non-blocking optimization warning, document the follow-up plan in the phase docs or hardening plan instead of quietly dropping it.
   Keep the current chunk narrow unless the optimization is required for correctness.
 

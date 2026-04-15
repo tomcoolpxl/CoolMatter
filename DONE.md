@@ -150,3 +150,15 @@ Verified on April 15, 2026:
 * added unit coverage for control-panel event routing in `tests/unit/control-panel.test.js`
 * extended integration coverage in `tests/integration/app-bootstrap.test.js` for control-panel wiring and update dispatch
 * verified that `npm run check` still passes after the full Phase 3 interaction wiring
+
+## Maintenance
+
+Verified on April 15, 2026:
+
+* added Playwright as a proper end-to-end test layer with `@playwright/test`
+* added `playwright.config.js` with a real browser target and `vite preview` web-server integration
+* added the browser smoke test in `tests/e2e/app.spec.js`
+* updated `package.json` with `preview:e2e`, `test:e2e`, and a `check` flow that includes Playwright
+* updated `GEMINI.md` so Playwright coverage is part of the repo testing rules when the browser-facing flow changes
+* verified `npm run test:e2e`
+* verified `npm run check`

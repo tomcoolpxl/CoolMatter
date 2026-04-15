@@ -9,11 +9,13 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:e2e": "vite preview --host 127.0.0.1 --port 4173",
     "validate": "node src/validation/runValidation.js",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
     "test": "npm run test:unit && npm run test:integration",
-    "check": "npm run build && npm run test && npm run validate"
+    "check": "npm run build && npm run test && npm run test:e2e && npm run validate"
   },
   "engines": {
     "node": ">=20.19.0"
