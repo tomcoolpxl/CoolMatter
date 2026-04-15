@@ -8,10 +8,10 @@ describe('app state', () => {
     const state = appState.getState()
 
     expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
-    expect(state.sampleCount).toBe(20000)
-    expect(state.pointSize).toBe(0.04)
-    expect(state.opacity).toBe(0.2)
-    expect(state.nucleusMode).toBe('visibleReference')
+    expect(state.sampleCount).toBe(2000000)
+    expect(state.pointSize).toBe(0.01)
+    expect(state.opacity).toBe(0.11)
+    expect(state.nucleusMode).toBe('physical')
     expect(state.isPlaying).toBe(false)
     expect(state.timeScale).toBe(1.0)
     expect(state.time).toBe(0.0)
@@ -34,9 +34,9 @@ describe('app state', () => {
     expect(state.superposition).toEqual([{ n: 2, l: 0, m: 0, magnitude: 1, phase: 0 }])
     expect(state.sampleCount).toBe(1500)
     expect(state.seed).toBe(99)
-    expect(state.pointSize).toBe(0.04)
-    expect(state.opacity).toBe(0.2)
-    expect(state.nucleusMode).toBe('visibleReference')
+    expect(state.pointSize).toBe(0.01)
+    expect(state.opacity).toBe(0.11)
+    expect(state.nucleusMode).toBe('physical')
   })
 
   it('updates visual fields without mutating regeneration fields', () => {
@@ -45,18 +45,18 @@ describe('app state', () => {
     const state = appState.applyVisualUpdate({
       pointSize: 0.12,
       opacity: 0.45,
-      nucleusMode: 'physical',
+      nucleusMode: 'visibleReference',
       isPlaying: true,
       timeScale: 2.0,
     })
 
     expect(state.pointSize).toBe(0.12)
     expect(state.opacity).toBe(0.45)
-    expect(state.nucleusMode).toBe('physical')
+    expect(state.nucleusMode).toBe('visibleReference')
     expect(state.isPlaying).toBe(true)
     expect(state.timeScale).toBe(2.0)
     expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
-    expect(state.sampleCount).toBe(20000)
+    expect(state.sampleCount).toBe(2000000)
     expect(state.seed).toBe(12345)
   })
 
@@ -71,7 +71,7 @@ describe('app state', () => {
     })
 
     expect(state.superposition).toEqual([{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }])
-    expect(state.sampleCount).toBe(20000)
+    expect(state.sampleCount).toBe(2000000)
     expect(state.seed).toBe(0)
     expect(state.truncation).toEqual({
       kind: 'spherical',
@@ -90,6 +90,6 @@ describe('app state', () => {
 
     expect(state.pointSize).toBe(0.001)
     expect(state.opacity).toBe(1)
-    expect(state.nucleusMode).toBe('visibleReference')
+    expect(state.nucleusMode).toBe('physical')
   })
 })
