@@ -1,5 +1,6 @@
 import { config } from '../app/config.js'
 import { createSeededRng } from '../sampling/rng.js'
+import { sampleHydrogenState } from '../sampling/sampleHydrogenState.js'
 import { createSphericalTruncation, describeTruncation } from '../sampling/truncation.js'
 import { assert } from '../utils/assert.js'
 
@@ -8,6 +9,7 @@ const RNG_SEQUENCE_LENGTH = 5
 export function runDeterministicChecks() {
   return [
     checkDeterministicRngSequence(),
+    checkDeterministicSamplingSummary(),
     checkDefaultTruncationDescription(),
   ]
 }
@@ -43,6 +45,46 @@ function checkDefaultTruncationDescription() {
     tolerance: 0,
     measuredResult: {
       truncation: description,
+    },
+    pass: true,
+  }
+}
+
+function checkDeterministicSamplingSummary() {
+  const truncation = createSphericalTruncation()
+  const sampleA = sampleHydrogenState({
+    stateId: config.initialStateId,
+    sampleCount: 4,
+    seed: config.defaultSeed,
+    truncation,
+  })
+  const sampleB = sampleHydrogenState({
+    stateId: config.initialStateId,
+    sampleCount: 4,
+    seed: config.defaultSeed,
+    truncation,
+  })
+  const positionsA = Array.from(sampleA.positions)
+  const positionsB = Array.from(sampleB.positions)
+
+  assert(
+    JSON.stringify(positionsA) === JSON.stringify(positionsB),
+    'Same seed should reproduce the same sampled positions',
+  )
+  assert(
+    JSON.stringify(sampleA.metadata) === JSON.stringify(sampleB.metadata),
+    'Same seed should reproduce the same sampling metadata',
+  )
+
+  return {
+    checkName: 'deterministic sampling summary',
+    tolerance: 0,
+    measuredResult: {
+      stateId: sampleA.metadata.stateId,
+      seed: sampleA.metadata.seed,
+      sampleCount: sampleA.metadata.sampleCount,
+      attemptCount: sampleA.metadata.attemptCount,
+      firstPosition: positionsA.slice(0, 3),
     },
     pass: true,
   }

@@ -1,8 +1,8 @@
 # Current TODO
 
-## Phase 1 chunk 5
+## Phase 1 chunk 6
 
-* implement `src/sampling/sampleHydrogenState.js`
-* add unit tests for sampling metadata and reproducibility
-* add integration coverage for the sampled pipeline boundary
+* implement `src/validation/histogramChecks.js`
+* compare sampled radial behavior against the expected truncated radial structure
+* add unit and integration coverage for histogram validation
 * verify `npm run check`

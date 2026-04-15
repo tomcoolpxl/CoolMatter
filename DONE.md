@@ -67,3 +67,15 @@ Verified on April 15, 2026:
 * extended unit coverage for RNG and truncation behavior in `tests/unit/rng-and-truncation.test.js`
 * extended integration coverage for the aggregated validation pipeline in `tests/integration/validation-runner.test.js`
 * verified the standard verification pass with `npm run check`
+
+## Phase 1 chunk 5
+
+Verified on April 15, 2026:
+
+* implemented the first truncated radial sampling pipeline in `src/sampling/sampleHydrogenState.js`
+* kept the sampler explicit for Phase 1 `s` states with seeded reproducibility and inspectable metadata
+* extended deterministic validation to include sampled-position reproducibility in `src/validation/deterministicChecks.js`
+* added unit coverage for sampling metadata, reproducibility, and truncation-respecting positions in `tests/unit/sample-hydrogen-state.test.js`
+* added integration coverage for the sampled pipeline boundary in `tests/integration/sampling-pipeline.test.js`
+* updated the aggregated validation integration expectation in `tests/integration/validation-runner.test.js`
+* verified the standard verification pass with `npm run check`
