@@ -45,6 +45,18 @@ export function createApp(root) {
   root.replaceChildren(controlPanel.element, renderer.domElement)
   scene.add(ambientLight, directionalLight)
 
+  function handleResize() {
+    const nextWidth = root.clientWidth || window.innerWidth
+    const nextHeight = root.clientHeight || window.innerHeight
+
+    camera.aspect = nextWidth / nextHeight
+    camera.updateProjectionMatrix()
+    renderer.setPixelRatio(window.devicePixelRatio || 1)
+    renderer.setSize(nextWidth, nextHeight)
+  }
+
+  window.addEventListener('resize', handleResize)
+
   function renderFrame() {
     controls.update()
     renderer.render(scene, camera)
@@ -61,6 +73,7 @@ export function createApp(root) {
     appState,
     sceneController,
     controlPanel,
+    handleResize,
     lights: {
       ambientLight,
       directionalLight,

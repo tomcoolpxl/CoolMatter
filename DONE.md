@@ -162,3 +162,15 @@ Verified on April 15, 2026:
 * updated `GEMINI.md` so Playwright coverage is part of the repo testing rules when the browser-facing flow changes
 * verified `npm run test:e2e`
 * verified `npm run check`
+
+## Phase 4 chunk 1
+
+Verified on April 15, 2026:
+
+* implemented explicit object disposal in `src/utils/dispose.js`
+* updated `src/scene/sceneController.js` to dispose replaced point-cloud and nucleus resources during replacement paths
+* updated `src/app/createApp.js` to own explicit resize handling for camera aspect, projection updates, renderer pixel ratio, and renderer size
+* added unit coverage for disposal helpers in `tests/unit/dispose.test.js`
+* extended unit coverage for scene-controller disposal behavior in `tests/unit/scene-controller.test.js`
+* extended integration coverage for resize ownership in `tests/integration/app-bootstrap.test.js`
+* verified `npm run check` including unit, integration, Playwright, and validation flows

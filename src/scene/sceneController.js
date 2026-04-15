@@ -2,6 +2,7 @@ import { config } from '../app/config.js'
 import { createElectronPointCloud } from '../renderables/createElectronPointCloud.js'
 import { createNucleusMarker } from '../renderables/createNucleusMarker.js'
 import { sampleHydrogenState } from '../sampling/sampleHydrogenState.js'
+import { disposeObject3D } from '../utils/dispose.js'
 
 export function createSceneController({
   scene,
@@ -38,6 +39,7 @@ export function createSceneController({
 
       applyPointCloudVisuals(nextPointCloud, currentState)
       scene.remove(currentPointCloud)
+      disposeObject3D(currentPointCloud)
       scene.add(nextPointCloud)
       currentPointCloud = nextPointCloud
 
@@ -57,6 +59,7 @@ export function createSceneController({
         const nextNucleusMarker = createNucleusMarker(currentState.nucleusMode)
 
         scene.remove(currentNucleusMarker)
+        disposeObject3D(currentNucleusMarker)
         scene.add(nextNucleusMarker)
         currentNucleusMarker = nextNucleusMarker
       }

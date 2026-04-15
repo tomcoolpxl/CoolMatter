@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const render = vi.fn()
+const setPixelRatio = vi.fn()
+const setSize = vi.fn()
 const rendererDomElement = { tagName: 'CANVAS' }
 const controlsUpdate = vi.fn()
 const sceneAdd = vi.fn()
@@ -81,6 +83,8 @@ vi.mock('../../src/scene/createRenderer.js', () => ({
     height,
     domElement: rendererDomElement,
     render,
+    setPixelRatio,
+    setSize,
   }),
 }))
 
@@ -112,6 +116,8 @@ vi.mock('../../src/scene/sceneController.js', () => ({
 describe('app bootstrap', () => {
   beforeEach(() => {
     render.mockReset()
+    setPixelRatio.mockReset()
+    setSize.mockReset()
     controlsUpdate.mockReset()
     sceneAdd.mockReset()
     createAppState.mockClear()
@@ -130,6 +136,8 @@ describe('app bootstrap', () => {
       innerWidth: 1280,
       innerHeight: 720,
       requestAnimationFrame: vi.fn(),
+      addEventListener: vi.fn(),
+      devicePixelRatio: 2,
     }
   })
 
@@ -150,6 +158,7 @@ describe('app bootstrap', () => {
     expect(createAppState).toHaveBeenCalledOnce()
     expect(createSceneController).toHaveBeenCalledOnce()
     expect(createControlPanel).toHaveBeenCalledOnce()
+    expect(window.addEventListener).toHaveBeenCalledWith('resize', app.handleResize)
     expect(sceneAdd).toHaveBeenCalledWith(
       { type: 'ambient' },
       { type: 'directional' },
@@ -181,5 +190,26 @@ describe('app bootstrap', () => {
     expect(appState.applyVisualUpdate).toHaveBeenCalledWith({ opacity: 0.55 })
     expect(sceneController.applyVisualUpdate).toHaveBeenCalledOnce()
     expect(sceneController.resetCamera).toHaveBeenCalledOnce()
+  })
+
+  it('owns resize updates for camera and renderer sizing', async () => {
+    const root = {
+      clientWidth: 900,
+      clientHeight: 500,
+      replaceChildren: vi.fn(),
+    }
+    const { createApp } = await import('../../src/app/createApp.js')
+
+    const app = createApp(root)
+
+    root.clientWidth = 640
+    root.clientHeight = 360
+    app.camera.updateProjectionMatrix = vi.fn()
+    app.handleResize()
+
+    expect(app.camera.aspect).toBeCloseTo(640 / 360, 12)
+    expect(app.camera.updateProjectionMatrix).toHaveBeenCalledOnce()
+    expect(setPixelRatio).toHaveBeenCalledWith(2)
+    expect(setSize).toHaveBeenCalledWith(640, 360)
   })
 })

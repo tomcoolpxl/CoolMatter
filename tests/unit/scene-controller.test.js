@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const sampleHydrogenState = vi.fn()
 const createElectronPointCloud = vi.fn()
 const createNucleusMarker = vi.fn()
+const disposeObject3D = vi.fn()
 
 vi.mock('../../src/sampling/sampleHydrogenState.js', () => ({
   sampleHydrogenState,
@@ -16,11 +17,16 @@ vi.mock('../../src/renderables/createNucleusMarker.js', () => ({
   createNucleusMarker,
 }))
 
+vi.mock('../../src/utils/dispose.js', () => ({
+  disposeObject3D,
+}))
+
 describe('scene controller', () => {
   beforeEach(() => {
     sampleHydrogenState.mockReset()
     createElectronPointCloud.mockReset()
     createNucleusMarker.mockReset()
+    disposeObject3D.mockReset()
   })
 
   it('creates the initial sample and current scene objects from the initial state', async () => {
@@ -116,6 +122,7 @@ describe('scene controller', () => {
 
     expect(sampleHydrogenState).toHaveBeenCalledTimes(2)
     expect(scene.remove).toHaveBeenCalledWith(initialPointCloud)
+    expect(disposeObject3D).toHaveBeenCalledWith(initialPointCloud)
     expect(scene.add).toHaveBeenCalledWith(nextPointCloud)
     expect(nextPointCloud.material.size).toBe(0.2)
     expect(nextPointCloud.material.opacity).toBe(0.5)
@@ -173,6 +180,7 @@ describe('scene controller', () => {
     expect(pointCloud.material.size).toBe(0.33)
     expect(pointCloud.material.opacity).toBe(0.66)
     expect(scene.remove).toHaveBeenCalledWith(initialNucleus)
+    expect(disposeObject3D).toHaveBeenCalledWith(initialNucleus)
     expect(scene.add).toHaveBeenCalledWith(physicalNucleus)
     expect(camera.position.set).toHaveBeenCalled()
     expect(camera.lookAt).toHaveBeenCalledWith(0, 0, 0)
