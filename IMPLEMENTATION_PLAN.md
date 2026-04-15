@@ -36,6 +36,78 @@ Reason:
 * validation must exist before visual confidence grows
 * the point cloud should be the last step of a correct data pipeline, not the first step of a visual experiment
 
+## Version 1 milestone and phase map
+
+Version 1 should not be treated as one long undifferentiated build.
+
+It should be delivered through four explicit phases, each with a concrete milestone.
+
+### Phase 1: validated scientific foundation
+
+Scope:
+
+* project bootstrap
+* config baseline
+* `1s` and `2s` formulas
+* deterministic RNG
+* truncation policy
+* first sampling pipeline
+* non-rendering validation
+
+Milestone 1 outcome:
+
+* a validated scientific pipeline exists and runs without launching the viewer
+
+### Phase 2: rendering shell and first visible viewer
+
+Scope:
+
+* Three.js scene, camera, renderer, controls, and lights
+* first point-cloud renderable
+* first nucleus marker
+* initial app composition that displays sampled output
+
+Milestone 2 outcome:
+
+* the app can render a black scene with orbit controls, a nucleus marker, and a sampled electron cloud
+
+### Phase 3: interaction and regeneration
+
+Scope:
+
+* app state
+* plain-DOM control panel
+* explicit regeneration versus visual-only update handling
+* scene-controller ownership of cloud replacement
+
+Milestone 3 outcome:
+
+* the viewer is interactively usable for version 1 core parameters without breaking reproducibility or mixing UI logic into the model layer
+
+### Phase 4: hardening and version 1 signoff
+
+Scope:
+
+* resize handling
+* disposal paths
+* minimal diagnostics
+* post-integration validation rerun
+* final review against version 1 done criteria
+
+Milestone 4 outcome:
+
+* version 1 is stable enough to call complete for its defined scope
+
+### Phase dependency rule
+
+These phases are sequential in intent:
+
+* Phase 2 assumes Phase 1 is complete
+* Phase 3 assumes Phase 2 is complete
+* Phase 4 assumes Phase 3 is complete
+
+Some file creation can overlap, but milestone completion should not.
+
 ## Immediate implementation decisions
 
 The following choices are fixed for the first implementation.
@@ -45,7 +117,7 @@ The following choices are fixed for the first implementation.
 * package manager: npm
 * app scaffold: Vite vanilla JavaScript template
 * 3D library: `three`
-* controls import: `three/examples/jsm/controls/OrbitControls.js`
+* controls import: `three/addons/controls/OrbitControls.js`
 
 ### Runtime choices
 
@@ -584,97 +656,115 @@ This can remain console-based in the first implementation.
 
 ## Recommended concrete build order
 
-Below is the recommended file-by-file order.
+Below is the recommended version 1 execution order grouped by milestone-bearing phases.
 
-### Phase A: clean setup
+### Phase 1: validated scientific foundation
 
 1. scaffold Vite app
 2. install `three`
 3. remove starter demo files
 4. create target folder structure
 5. add central config file
-
-### Phase B: scientific kernel
-
 6. implement constants
 7. implement coordinate utilities
 8. implement `1s` and `2s` formulas
 9. implement state registry
 10. implement density evaluators
-
-### Phase C: validation before graphics
-
 11. implement normalization checks
 12. implement node checks
 13. implement seeded RNG
 14. implement deterministic checks
-15. implement first sampling function
-16. implement histogram checks
-17. run validation and resolve failures before moving on
+15. implement truncation policy
+16. implement first sampling function
+17. implement histogram checks
+18. run validation and resolve failures before moving on
 
-### Phase D: graphics shell
+Milestone 1:
 
-18. implement scene, camera, renderer, controls, and lights
-19. render empty scene
-20. implement point-cloud and nucleus renderables
-21. implement scene controller
+* the scientific pipeline is validated independently of rendering
+
+### Phase 2: rendering shell and first visible viewer
+
+19. implement scene, camera, renderer, controls, and lights
+20. render empty scene
+21. implement point-cloud and nucleus renderables
 22. connect scientific sample output to point-cloud rendering
+23. render the initial sampled state in the viewer
 
-### Phase E: interaction
+Milestone 2:
 
-23. implement app state
-24. implement control panel
-25. wire visual-only updates
-26. wire regeneration updates
-27. add camera reset
+* a visible viewer exists with orbit controls, nucleus marker, and sampled cloud
 
-### Phase F: hardening
+### Phase 3: interaction and regeneration
 
-28. implement resize handling
-29. implement disposal helpers
-30. review metadata flow
-31. verify reproducibility manually
-32. rerun validation after full integration
+24. implement app state
+25. implement scene controller
+26. implement control panel
+27. wire visual-only updates
+28. wire regeneration updates
+29. add camera reset
 
-## Done criteria by stage
+Milestone 3:
 
-## Stage completion: scientific kernel
+* the viewer is interactively usable for version 1 parameters
 
-This stage is done when:
+### Phase 4: hardening and version 1 signoff
+
+30. implement resize handling
+31. implement disposal helpers
+32. review metadata flow
+33. add developer-facing diagnostics
+34. verify reproducibility manually
+35. rerun validation after full integration
+36. review against the version 1 checklist before signoff
+
+Milestone 4:
+
+* version 1 is complete for the defined scope
+
+## Milestone completion criteria
+
+### Milestone 1: validated scientific foundation
+
+Milestone 1 is done when:
 
 * `1s` and `2s` density evaluators exist
 * coordinate utilities are working
 * the state registry is explicit and inspectable
-
-## Stage completion: validation
-
-This stage is done when:
-
 * normalization checks run
 * node checks run
 * deterministic RNG checks run
 * histogram checks run after sampling exists
 * validation can be launched from a simple script command
 
-## Stage completion: first render
+### Milestone 2: first visible viewer
 
-This stage is done when:
+Milestone 2 is done when:
 
 * a black scene appears
 * the camera orbits and zooms
 * a nucleus marker is visible
 * a point cloud generated from sampled data is visible
 
-## Stage completion: usable version 1 prototype
+### Milestone 3: usable version 1 prototype
 
-This stage is done when:
+Milestone 3 is done when:
 
 * user can switch between `1s` and `2s`
 * user can change point size and opacity
 * user can change sample count and regenerate
 * user can switch nucleus scale mode
 * same seed gives reproducible output
+
+### Milestone 4: version 1 complete
+
+Milestone 4 is done when:
+
 * validation still passes after integration
+* resize handling works
+* point-cloud regeneration disposes old geometry correctly
+* visual-only updates do not regenerate samples accidentally
+* diagnostics expose current run metadata
 
 ## Review checklist before calling version 1 complete
 
