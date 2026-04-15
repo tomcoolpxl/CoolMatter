@@ -1,9 +1,8 @@
 # Current TODO
 
-## Phase 1 chunk 4
+## Phase 1 chunk 5
 
-* implement `src/sampling/rng.js`
-* implement `src/sampling/truncation.js`
-* add deterministic RNG unit and integration coverage
-* add truncation unit and integration coverage
+* implement `src/sampling/sampleHydrogenState.js`
+* add unit tests for sampling metadata and reproducibility
+* add integration coverage for the sampled pipeline boundary
 * verify `npm run check`

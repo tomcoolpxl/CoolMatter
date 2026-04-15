@@ -55,3 +55,15 @@ Verified on April 15, 2026:
 * added an integration test for the end-to-end scientific validation runner
 * updated `npm run check` to run build, unit tests, integration tests, and validation
 * documented in `GEMINI.md` that every implementation chunk must add or update both unit and integration coverage
+
+## Phase 1 chunk 4
+
+Verified on April 15, 2026:
+
+* implemented a deterministic seeded RNG in `src/sampling/rng.js`
+* implemented explicit spherical truncation helpers in `src/sampling/truncation.js`
+* added deterministic RNG validation in `src/validation/deterministicChecks.js`
+* added truncation validation in `src/validation/truncationChecks.js`
+* extended unit coverage for RNG and truncation behavior in `tests/unit/rng-and-truncation.test.js`
+* extended integration coverage for the aggregated validation pipeline in `tests/integration/validation-runner.test.js`
+* verified the standard verification pass with `npm run check`

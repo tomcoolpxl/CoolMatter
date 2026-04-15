@@ -1,12 +1,16 @@
 import { runCoordinateChecks } from './coordinateChecks.js'
+import { runDeterministicChecks } from './deterministicChecks.js'
 import { runNodeChecks } from './nodeChecks.js'
 import { runNormalizationChecks } from './normalizationChecks.js'
+import { runTruncationChecks } from './truncationChecks.js'
 
 export function collectValidationResults() {
   return [
     ...runCoordinateChecks(),
+    ...runDeterministicChecks(),
     ...runNormalizationChecks(),
     ...runNodeChecks(),
+    ...runTruncationChecks(),
   ]
 }
 
