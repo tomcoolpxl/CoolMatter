@@ -11,14 +11,21 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg: #030712;
-        --bg-soft: #0c1424;
-        --panel: rgba(9, 15, 27, 0.84);
-        --line: rgba(151, 169, 197, 0.18);
-        --text: #edf3ff;
-        --muted: #97a9c5;
-        --accent: #7ce7ff;
-        --warm: #ffd38a;
+        --bg: #020611;
+        --bg-deep: #061222;
+        --panel: rgba(8, 14, 24, 0.9);
+        --panel-strong: rgba(8, 14, 24, 0.96);
+        --surface: rgba(12, 21, 36, 0.9);
+        --surface-soft: rgba(14, 25, 42, 0.66);
+        --line: rgba(156, 182, 212, 0.16);
+        --line-strong: rgba(156, 182, 212, 0.28);
+        --text: #eef5ff;
+        --muted: #9db2cf;
+        --accent: #82e9ff;
+        --accent-strong: #d8fbff;
+        --warm: #ffd289;
+        --danger: #ff9e9e;
+        --shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
       }
 
       * {
@@ -31,12 +38,40 @@
         font-family: "Georgia", "Times New Roman", serif;
         color: var(--text);
         background:
-          radial-gradient(circle at top, rgba(124, 231, 255, 0.18), transparent 24rem),
-          linear-gradient(180deg, #06101c 0%, var(--bg) 52%, #04070d 100%);
+          radial-gradient(circle at 18% 12%, rgba(130, 233, 255, 0.16), transparent 22rem),
+          radial-gradient(circle at 85% 8%, rgba(255, 210, 137, 0.09), transparent 18rem),
+          linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 56%, #04070d 100%);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        transition:
+          transform 140ms ease,
+          border-color 140ms ease,
+          background 140ms ease,
+          color 140ms ease,
+          box-shadow 140ms ease;
+      }
+
+      button:hover {
+        border-color: var(--line-strong);
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
       }
 
       .shell {
-        width: min(1240px, calc(100% - 2rem));
+        width: min(1400px, calc(100% - 2rem));
         margin: 0 auto;
         padding: 1.5rem 0 2rem;
       }
@@ -44,32 +79,41 @@
       .masthead {
         display: flex;
         justify-content: space-between;
-        gap: 1rem;
-        align-items: center;
-        margin-bottom: 1rem;
+        align-items: end;
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
       }
 
       .brand {
-        letter-spacing: 0.24rem;
+        letter-spacing: 0.28rem;
         text-transform: uppercase;
         font-size: 0.82rem;
         color: var(--muted);
+        margin-bottom: 0.45rem;
+      }
+
+      .masthead h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.6rem);
+        line-height: 1.02;
+        max-width: 10ch;
       }
 
       .masthead p {
         margin: 0;
         color: var(--muted);
-        max-width: 38rem;
+        max-width: 34rem;
         text-align: right;
-        line-height: 1.5;
+        line-height: 1.65;
+        font-size: 1rem;
       }
 
       .panel {
         border: 1px solid var(--line);
-        border-radius: 1.5rem;
+        border-radius: 1.6rem;
         background: var(--panel);
         overflow: hidden;
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+        box-shadow: var(--shadow);
       }
 
       .panel-header {
@@ -79,12 +123,7 @@
         align-items: center;
         padding: 1rem 1.25rem;
         border-bottom: 1px solid var(--line);
-        background: rgba(3, 7, 18, 0.72);
-      }
-
-      .panel-header h1 {
-        margin: 0;
-        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        background: rgba(5, 9, 18, 0.84);
       }
 
       .panel-header .meta {
@@ -92,82 +131,385 @@
         font-size: 0.95rem;
       }
 
+      .panel-header .meta strong {
+        display: block;
+        color: var(--accent-strong);
+        font-size: 0.84rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+      }
+
       #app {
         display: grid;
-        grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-        height: clamp(500px, 72vh, 800px);
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+        min-height: clamp(620px, 78vh, 920px);
       }
 
       .control-panel {
         display: grid;
-        gap: 0.9rem;
+        gap: 1rem;
         align-content: start;
-        padding: 1.2rem;
-        border-right: 1px solid var(--line);
-        background: rgba(5, 10, 18, 0.92);
+        padding: 1.15rem;
+        border-left: 1px solid var(--line);
+        background: rgba(5, 10, 18, 0.82);
         overflow-y: auto;
+        grid-column: 2;
       }
 
-      .control-panel label {
+      .viewer-pane {
+        position: relative;
         display: grid;
-        gap: 0.35rem;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at 50% 24%, rgba(130, 233, 255, 0.11), transparent 22rem),
+          linear-gradient(180deg, rgba(6, 14, 27, 0.96) 0%, rgba(2, 8, 15, 0.98) 100%);
+        grid-column: 1;
+      }
+
+      .viewer-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: start;
+        padding: 1rem 1rem 0;
+        position: relative;
+        z-index: 2;
+      }
+
+      .viewer-status {
+        display: grid;
+        gap: 0.25rem;
+        max-width: 32rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 1.1rem;
+        background: rgba(7, 13, 23, 0.68);
+        backdrop-filter: blur(14px);
+      }
+
+      .viewer-status-title {
+        font-size: 1.08rem;
+      }
+
+      .viewer-status-meta {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .viewer-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: end;
+        gap: 0.55rem;
+      }
+
+      .viewer-tool {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(10, 17, 30, 0.82);
+        color: var(--text);
+        padding: 0.72rem 1rem;
+        cursor: pointer;
+      }
+
+      .viewer-tool-primary {
+        background: rgba(130, 233, 255, 0.14);
+        border-color: rgba(130, 233, 255, 0.28);
+      }
+
+      .viewer-frame {
+        min-height: 100%;
+        position: relative;
+      }
+
+      .viewer-hint {
+        margin: 0;
+        padding: 0.95rem 1rem 1.05rem;
         color: var(--muted);
         font-size: 0.94rem;
+        line-height: 1.55;
       }
 
       .control-panel input,
-      .control-panel select,
       .control-panel button {
         width: 100%;
         border: 1px solid var(--line);
-        border-radius: 0.85rem;
-        background: rgba(10, 16, 28, 0.9);
+        border-radius: 0.95rem;
+        background: rgba(10, 16, 28, 0.88);
         color: var(--text);
-        padding: 0.78rem 0.92rem;
-        font: inherit;
+        padding: 0.82rem 0.92rem;
       }
 
       .control-panel button {
         cursor: pointer;
       }
 
-      .add-component-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-      }
-      .add-component-grid button {
-        grid-column: span 3;
+      .panel-section,
+      .advanced-panel {
+        border: 1px solid var(--line);
+        border-radius: 1.2rem;
+        background: var(--surface-soft);
+        padding: 1rem;
       }
 
-      .superposition-list {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 1rem 0;
-        display: grid;
-        gap: 1rem;
+      .panel-intro {
+        background:
+          linear-gradient(180deg, rgba(130, 233, 255, 0.12), rgba(130, 233, 255, 0.03)),
+          rgba(10, 17, 29, 0.86);
       }
-      .superposition-list li {
-        background: rgba(0, 0, 0, 0.4);
-        padding: 0.8rem;
-        border-radius: 0.85rem;
+
+      .panel-intro h2,
+      .section-header h2 {
+        margin: 0;
+        font-size: 1.18rem;
+        line-height: 1.2;
+      }
+
+      .section-eyebrow {
+        margin: 0 0 0.32rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.74rem;
+      }
+
+      .section-copy {
+        margin: 0.45rem 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 0.95rem;
+      }
+
+      .section-content {
+        display: grid;
+        gap: 0.9rem;
+        margin-top: 1rem;
+      }
+
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.65rem;
+      }
+
+      .preset-card {
+        display: grid;
+        gap: 0.45rem;
+        text-align: left;
+        align-content: start;
+        min-height: 8rem;
+        background: rgba(7, 12, 22, 0.9);
+      }
+
+      .preset-card strong {
+        color: var(--accent-strong);
+        font-size: 0.98rem;
+      }
+
+      .preset-card span {
+        color: var(--muted);
+        line-height: 1.45;
+        font-size: 0.9rem;
+      }
+
+      .preset-card.is-active {
+        border-color: rgba(130, 233, 255, 0.36);
+        background: rgba(130, 233, 255, 0.1);
+        box-shadow: inset 0 0 0 1px rgba(130, 233, 255, 0.15);
+      }
+
+      .mix-summary {
+        margin: 0;
+        color: var(--accent-strong);
+        font-size: 0.95rem;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+      }
+
+      .chip-button {
+        width: auto;
+        padding: 0.62rem 0.9rem;
+        border-radius: 999px;
+      }
+
+      .component-list {
+        display: grid;
+        gap: 0.8rem;
+      }
+
+      .component-card {
         border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: rgba(5, 10, 18, 0.72);
+        padding: 0.95rem;
+        display: grid;
+        gap: 0.8rem;
+      }
+
+      .component-card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: start;
+      }
+
+      .component-card h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .component-meta,
+      .component-share {
+        margin: 0.25rem 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .danger-action {
+        width: auto;
+        color: var(--danger);
+      }
+
+      .secondary-action {
+        background: rgba(12, 19, 31, 0.82);
+      }
+
+      .range-control,
+      .number-control {
+        display: grid;
+        gap: 0.45rem;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .range-control-topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .range-value {
+        color: var(--accent-strong);
+        font-size: 0.9rem;
+      }
+
+      .range-control input[type='range'] {
+        width: 100%;
+        padding: 0;
+        appearance: none;
+        height: 0.36rem;
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(130, 233, 255, 0.65), rgba(255, 210, 137, 0.5));
+      }
+
+      .range-control input[type='range']::-webkit-slider-thumb {
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--accent-strong);
+        box-shadow: 0 0 0 3px rgba(130, 233, 255, 0.18);
+      }
+
+      .segmented-field {
+        display: grid;
+        gap: 0.45rem;
+      }
+
+      .segmented-label {
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .segmented-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem;
+        padding: 0.3rem;
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: rgba(6, 12, 22, 0.75);
+      }
+
+      .segmented-group button {
+        border-radius: 0.8rem;
+        background: transparent;
+        border-color: transparent;
+      }
+
+      .segmented-group button.is-active {
+        background: rgba(130, 233, 255, 0.12);
+        border-color: rgba(130, 233, 255, 0.26);
+        color: var(--accent-strong);
+      }
+
+      .time-readout {
+        margin: 0;
+        color: var(--accent-strong);
+        font-size: 1rem;
+      }
+
+      .advanced-builder,
+      .advanced-panel {
+        margin-top: 0.2rem;
+      }
+
+      .advanced-builder summary,
+      .advanced-panel summary {
+        cursor: pointer;
+        color: var(--accent-strong);
+      }
+
+      .advanced-builder-grid,
+      .advanced-panel-content {
+        display: grid;
+        gap: 0.8rem;
+        margin-top: 0.85rem;
+      }
+
+      .advanced-builder-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .advanced-builder-grid button {
+        grid-column: 1 / -1;
+      }
+
+      .diagnostics {
         display: grid;
         gap: 0.75rem;
       }
-      .superposition-list li > div {
-        color: var(--accent);
-        font-family: monospace;
-        font-size: 1rem;
-        text-align: center;
+
+      .diagnostics h3 {
+        margin: 0;
+        font-size: 0.98rem;
       }
 
-      .controls-help {
+      .diagnostics-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.35rem 0.75rem;
         margin: 0;
+      }
+
+      .diagnostics-grid dt {
         color: var(--muted);
-        line-height: 1.5;
-        font-size: 0.92rem;
+        font-size: 0.84rem;
+      }
+
+      .diagnostics-grid dd {
+        margin: 0 0 0.4rem;
+        color: var(--text);
+        line-height: 1.45;
       }
 
       canvas {
@@ -181,10 +523,21 @@
         color: var(--muted);
         line-height: 1.6;
         font-size: 0.94rem;
+        max-width: 64rem;
       }
 
       .footnote code {
         color: var(--warm);
+      }
+
+      @media (max-width: 1100px) {
+        #app {
+          grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+        }
+
+        .preset-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       @media (max-width: 900px) {
@@ -201,9 +554,33 @@
           grid-template-columns: 1fr;
         }
 
+        .viewer-pane {
+          grid-column: auto;
+          min-height: 58vh;
+        }
+
         .control-panel {
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
+          grid-column: auto;
+          border-left: 0;
+          border-top: 1px solid var(--line);
+          border-radius: 1.4rem 1.4rem 0 0;
+          margin-top: -0.4rem;
+          position: relative;
+          z-index: 2;
+          background: var(--panel-strong);
+        }
+
+        .viewer-header {
+          flex-direction: column;
+        }
+
+        .viewer-toolbar {
+          justify-content: start;
+        }
+
+        .advanced-builder-grid,
+        .preset-grid {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -213,26 +590,32 @@
       <header class="masthead">
         <div>
           <div class="brand">CoolMatter</div>
-          <h1>Validated Hydrogen Orbital Viewer</h1>
+          <h1>Explore hydrogen orbitals as probability landscapes.</h1>
         </div>
         <p>
-          This file is the Vite app entrypoint. GitHub Pages should publish the built <code>dist/</code>
-          output so the viewer loads with repository-safe asset paths.
+          Start with a familiar state, compare orbital mixes, and inspect the sampled probability distribution
+          from the same underlying quantum model in either point-cloud or volumetric form.
         </p>
       </header>
 
       <section class="panel">
         <div class="panel-header">
-          <div class="meta">Version 1: <code>1s</code>, <code>2s</code>, seeded samples, plain DOM controls</div>
-          <div class="meta">Authoritative quantity: <code>rho(x, y, z) = |psi_nlm|^2</code></div>
+          <div class="meta">
+            <strong>Primary view</strong>
+            Viewer-first workspace with guided controls and advanced diagnostics tucked away.
+          </div>
+          <div class="meta">
+            <strong>Scientific quantity</strong>
+            <code>rho(x, y, z) = |psi_nlm|^2</code>
+          </div>
         </div>
         <div id="app" aria-label="CoolMatter app"></div>
       </section>
 
       <p class="footnote">
-        Local entrypoint:
-        Vite loads the app from <code>./src/main.js</code> during development and rewrites the final asset
-        paths during <code>npm run build</code> for static hosting.
+        The rendered scene represents sampled outcomes derived from
+        <code>|psi|^2</code>. The nucleus remains a reference marker and can be shown either at physical scale or
+        as a visible guide for orientation.
       </p>
     </div>
 

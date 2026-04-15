@@ -1,13 +1,13 @@
 # Implementation State and Architecture
 
 ## Purpose
-This document describes the reality of the current project implementation. It serves as the authoritative source on the application's structure, design decisions, and testing boundaries for any AI agent interacting with the CoolMatter repository. 
+This document describes the reality of the current project implementation. It serves as the authoritative source on the application's structure, design decisions, and testing boundaries for any AI agent interacting with the CoolMatter repository.
 
 All four initial implementation phases (Scientific Foundation, Rendering Shell, Interaction, Hardening) have been completed. 
 
 ## Current Architecture Overview
 
-The project is a browser-based 3D hydrogen orbital viewer enforcing strict separation between scientific calculation (the "model") and visual representation (the "view"). 
+The project is a browser-based 3D hydrogen orbital viewer enforcing strict separation between scientific calculation (the "model") and visual representation (the "view").
 
 ### Key Technologies
 - **App Scaffold**: Vite (vanilla JavaScript template)
@@ -19,7 +19,7 @@ The project is a browser-based 3D hydrogen orbital viewer enforcing strict separ
 
 - `src/app/`
   - `config.js`: Centralized defaults (seeds, states, visual radii) to prevent magic numbers.
-  - `createApp.js`: Ties the model, view, and controller together to launch the application.
+  - `createApp.js`: Builds the viewer-first shell, in-view toolbar, HUD messaging, and wires app state to the scene controller and control panel.
 - `src/physics/hydrogen/`
   - `constants.js`: Bohr radius scale conventions and scientific tolerances.
   - `coordinates.js`: Conversions between Cartesian and spherical coordinates.
@@ -36,8 +36,8 @@ The project is a browser-based 3D hydrogen orbital viewer enforcing strict separ
   - `createElectronPointCloud.js`: Processes `Float32Array` buffers into `BufferGeometry` for `THREE.Points`.
   - `createNucleusMarker.js`: The central origin marker, supporting multiple modes (physical scale vs. visually enlarged).
 - `src/ui/`
-  - `appState.js`: The central reactive state that emits events on change. 
-  - `controlPanel.js`: Vanilla DOM-based control panel avoiding heavy frameworks like React or Vue. 
+  - `appState.js`: The central reactive state that sanitizes regeneration and visual updates.
+  - `controlPanel.js`: Vanilla DOM-based grouped control surface with preset-first state selection, segmented visual toggles, slider-driven adjustments, and collapsed advanced diagnostics.
 - `src/validation/`
   - Runs pure-Node structural checks via `npm run validate` bypassing the browser. Verifies norm, modes, truncations, and RNG determinism.
 - `tests/`
@@ -45,13 +45,12 @@ The project is a browser-based 3D hydrogen orbital viewer enforcing strict separ
 
 ## Implemented Flow (Data Pipeline)
 
-1. **State Selection**: User selects parameter (e.g., `1s`, 10k samples) via `controlPanel.js`.
-2. **State AppState Event**: `appState.js` updates and fires an event.
-3. **Controller Handling**: `sceneController.js` handles the event.
-   - If it's a visual-only update (e.g., point size), it edits the material directly.
-   - If it's a regeneration update (e.g., seed, state, sample count), it calls the sampling pipeline.
+1. **State Selection**: User chooses a preset or edits component cards in `controlPanel.js`.
+2. **State Sanitization**: `appState.js` normalizes valid superpositions, rejects zero-norm mixes, and clamps visual controls.
+3. **Controller Handling**: `createApp.js` routes regeneration updates to `sceneController.js`, syncs the HUD/control panel, and posts transient viewer messages.
 4. **Sampling Data**: `sampleHydrogenState.js` gets the mathematical state from `states.js`, draws deterministic numbers from `rng.js`, tests them against `density.js`, and yields an array of positions.
 5. **Geometry Construction**: The positions go to `createElectronPointCloud.js`. Old geometry is disposed via `utils/dispose.js`. The new model is mounted to the scene.
+6. **Visual-Only Updates**: Point size, opacity, render mode, playback, and nucleus scale remain downstream of the scientific model and update render objects without changing the underlying density definition.
 
 ## Strict Rules
 
@@ -59,7 +58,7 @@ The project is a browser-based 3D hydrogen orbital viewer enforcing strict separ
 2. **No Visual Contamination**: The `src/physics/` layer must NEVER import `three` or interact with visual concerns.
 3. **Re-runs are identical**: Two sampling passes with the same string seed must render the identical point geometry buffer.
 4. **Validation First**: Numerical correctness is asserted numerically natively (`npm run validate`), separately from unit and e2e testing.
-5. **No Speculative Abstraction**: Avoid adding flexible features not yet requested (`2p` capabilities, shaders, volumetrics).
+5. **No Visual/Model Drift**: The more guided UI must still preserve the strict distinction between presets, sampled outcomes, diagnostics, and the underlying `|psi|^2` model.
 
 ## Completion Status
 The version 1 milestones are DONE.
@@ -67,3 +66,4 @@ The version 1 milestones are DONE.
 - 1s and 2s hydrogen densities are implemented and numerically verified.
 - The viewer works via Vite preview and builds out successfully to GitHub pages.
 - Memory management (disposal on regeneration) is tested and in place.
+- The live UI now centers the viewer, uses preset-first state controls, and hides reproducibility diagnostics behind progressive disclosure.

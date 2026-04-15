@@ -13,6 +13,16 @@ export function createApp(root) {
   assert(root, 'Expected app root element')
 
   const documentRef = root.ownerDocument ?? document
+  const viewerPane = documentRef.createElement('section')
+  const viewerHeader = documentRef.createElement('div')
+  const viewerStatus = documentRef.createElement('div')
+  const viewerStatusTitle = documentRef.createElement('strong')
+  const viewerStatusMeta = documentRef.createElement('span')
+  const viewerToolbar = documentRef.createElement('div')
+  const playbackToggle = documentRef.createElement('button')
+  const renderModeToggle = documentRef.createElement('button')
+  const resetCameraButton = documentRef.createElement('button')
+  const viewerHint = documentRef.createElement('p')
   const viewport = documentRef.createElement('div')
   const width = root.clientWidth || window.innerWidth
   const height = root.clientHeight || window.innerHeight
@@ -44,8 +54,30 @@ export function createApp(root) {
       validationCommand: validationSummary.command,
     }
   }
+  viewerPane.className = 'viewer-pane'
+  viewerHeader.className = 'viewer-header'
+  viewerStatus.className = 'viewer-status'
+  viewerStatusTitle.className = 'viewer-status-title'
+  viewerStatusMeta.className = 'viewer-status-meta'
+  viewerToolbar.className = 'viewer-toolbar'
+  viewerHint.className = 'viewer-hint'
   viewport.className = 'viewer-frame'
+  viewport.setAttribute?.('aria-label', '3D orbital viewer')
   viewport.append(renderer.domElement)
+
+  playbackToggle.type = 'button'
+  playbackToggle.className = 'viewer-tool viewer-tool-primary'
+  renderModeToggle.type = 'button'
+  renderModeToggle.className = 'viewer-tool'
+  resetCameraButton.type = 'button'
+  resetCameraButton.className = 'viewer-tool'
+  resetCameraButton.textContent = 'Reset camera'
+  viewerHint.textContent = 'Drag to orbit, right-drag or WASD to pan, and scroll to zoom.'
+
+  viewerStatus.append(viewerStatusTitle, viewerStatusMeta)
+  viewerToolbar.append(playbackToggle, renderModeToggle, resetCameraButton)
+  viewerHeader.append(viewerStatus, viewerToolbar)
+  viewerPane.append(viewerHeader, viewport, viewerHint)
 
   const controlPanel = createControlPanel({
     state: appState.getState(),
@@ -55,20 +87,48 @@ export function createApp(root) {
 
       sceneController.applyRegenerationUpdate(nextState)
       controlPanel.updateDiagnostics(buildDiagnostics())
+      controlPanel.syncState?.(nextState)
+      updateViewerChrome(nextState, partialState.superposition ? 'Orbital mix refreshed and normalized.' : 'Sampling refreshed.')
+      return nextState
     },
     onVisualUpdate(partialState) {
       const nextState = appState.applyVisualUpdate(partialState)
 
       sceneController.applyVisualUpdate(nextState)
       controlPanel.updateDiagnostics(buildDiagnostics())
+      controlPanel.syncState?.(nextState)
+      updateViewerChrome(nextState)
+      return nextState
     },
     onResetCamera() {
       sceneController.resetCamera()
+      setTransientViewerMessage('Camera reset to the default framing.')
     },
   })
 
-  root.replaceChildren(controlPanel.element, viewport)
+  resetCameraButton.addEventListener('click', () => {
+    sceneController.resetCamera()
+    setTransientViewerMessage('Camera reset to the default framing.')
+  })
+  playbackToggle.addEventListener('click', () => {
+    const state = appState.getState()
+    const nextState = appState.applyVisualUpdate({ isPlaying: !state.isPlaying })
+    sceneController.applyVisualUpdate(nextState)
+    controlPanel.syncState?.(nextState)
+    updateViewerChrome(nextState)
+  })
+  renderModeToggle.addEventListener('click', () => {
+    const state = appState.getState()
+    const nextRenderMode = state.renderMode === 'volumetric' ? 'point_cloud' : 'volumetric'
+    const nextState = appState.applyVisualUpdate({ renderMode: nextRenderMode })
+    sceneController.applyVisualUpdate(nextState)
+    controlPanel.syncState?.(nextState)
+    updateViewerChrome(nextState)
+  })
+
+  root.replaceChildren(viewerPane, controlPanel.element)
   scene.add(ambientLight, directionalLight)
+  updateViewerChrome(appState.getState())
 
   function handleResize() {
     const nextWidth = viewport.clientWidth || root.clientWidth || window.innerWidth
@@ -106,6 +166,7 @@ export function createApp(root) {
       if (controlPanel.updateTimeText) {
         controlPanel.updateTimeText(newTime)
       }
+      updateViewerChrome({ ...state, time: newTime })
     }
 
     sceneController.update(newTime, rawDelta)
@@ -126,6 +187,7 @@ export function createApp(root) {
     sceneController,
     controlPanel,
     viewport,
+    viewerPane,
     handleResize,
     lights: {
       ambientLight,
@@ -148,4 +210,43 @@ export function createApp(root) {
       renderer.dispose?.()
     },
   }
+
+  function updateViewerChrome(state, temporaryMessage = null) {
+    const modeText = state.renderMode === 'volumetric' ? 'Volumetric' : 'Point Cloud'
+    const playText = state.isPlaying ? 'Pause motion' : 'Play motion'
+
+    playbackToggle.textContent = playText
+    playbackToggle.setAttribute?.('aria-pressed', state.isPlaying ? 'true' : 'false')
+    renderModeToggle.textContent = modeText
+    viewerStatusTitle.textContent = formatMixSummary(state.superposition)
+    viewerStatusMeta.textContent = temporaryMessage ?? `${modeText} · ${formatTimeLabel(state.time ?? 0)}`
+  }
+
+  function setTransientViewerMessage(message) {
+    const state = appState.getState()
+    updateViewerChrome(state, message)
+    window.setTimeout?.(() => {
+      updateViewerChrome(appState.getState())
+    }, 1800)
+  }
+}
+
+function formatMixSummary(superposition = []) {
+  if (!Array.isArray(superposition) || superposition.length === 0) {
+    return 'No active orbital'
+  }
+
+  return superposition.map((component) => {
+    if (component.l === 0) {
+      return `${component.n}s`
+    }
+    if (component.l === 1) {
+      return `${component.n}p`
+    }
+    return `n${component.n} l${component.l} m${component.m}`
+  }).join(' + ')
+}
+
+function formatTimeLabel(time) {
+  return `t = ${Number(time).toFixed(2)} a.u.`
 }

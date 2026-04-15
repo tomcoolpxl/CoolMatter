@@ -6,31 +6,37 @@ test('loads the app shell and interactive controls', async ({ page }) => {
   await expect(page).toHaveTitle('CoolMatter')
   await expect(page.locator('#app')).toBeVisible()
   await expect(page.locator('.control-panel')).toBeVisible()
+  await expect(page.locator('.viewer-pane')).toBeVisible()
   await expect(page.locator('canvas')).toBeVisible()
-  
-  await expect(page.getByText('Superposition Mixer')).toBeVisible()
-  await expect(page.getByText('Playback & Timeline')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
-  
-  await expect(page.getByLabel('Nucleus mode')).toHaveValue('physical')
-  await expect(page.getByText('Diagnostics')).toBeVisible()
-  await expect(page.getByText('Offline validation required before signoff')).toBeVisible()
-  await expect(page.getByText('Drag to orbit, right-drag or WASD to pan, and scroll to zoom.')).toBeVisible()
 
-  // Reduce sample count significantly for faster E2E test execution
+  await expect(page.getByRole('heading', { name: 'Orbital mix' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Time and playback' })).toBeVisible()
+  await expect(page.locator('.preset-card').filter({ hasText: '1s Ground' }).first()).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Play motion' })).toBeVisible()
+  await expect(page.locator('.viewer-hint')).toContainText('Drag to orbit, right-drag or WASD to pan, and scroll to zoom.')
+
+  await page.locator('.preset-card').filter({ hasText: '1s + 2s Mix' }).first().click()
+  await expect(page.locator('.mix-summary')).toContainText('1s + 2s')
+  await expect(page.locator('.viewer-status-title')).toContainText('1s + 2s')
+
+  await page.getByRole('button', { name: 'Add 2s' }).click()
+  await expect(page.locator('.component-list')).toContainText('2s')
+
+  await page.locator('#point-size-input').evaluate((input) => {
+    input.value = '0.12'
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  await expect(page.locator('#point-size-input')).toHaveValue('0.12')
+
+  await page.getByRole('button', { name: 'Volumetric' }).click()
+  await expect(page.locator('.viewer-status-meta')).toContainText('Volumetric')
+
+  await page.getByText('Advanced diagnostics and reproducibility').click()
   await page.getByLabel('Sample count').fill('20000')
   await expect(page.getByLabel('Sample count')).toHaveValue('20000')
+  await expect(page.locator('.diagnostics')).toContainText('Diagnostics')
 
-  // Add a component
-  await page.getByLabel('n (size)', { exact: true }).fill('2')
-  await page.getByLabel('l (shape)', { exact: true }).fill('0')
-  await page.getByLabel('m (tilt)', { exact: true }).fill('0')
-  await page.getByRole('button', { name: 'Add Component' }).click()
-
-  await expect(page.locator('.diagnostics')).toContainText('|2,0,0⟩')
-
-  await page.getByLabel('Point size').fill('0.12')
-  await expect(page.getByLabel('Point size')).toHaveValue('0.12')
+  await page.getByRole('button', { name: 'Play motion' }).click()
   await page.locator('canvas').click({ position: { x: 24, y: 24 } })
   await page.keyboard.press('KeyW')
 
