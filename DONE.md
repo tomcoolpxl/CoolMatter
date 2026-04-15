@@ -45,3 +45,13 @@ Verified on April 15, 2026:
 * documented that finite-cutoff normalization checks must compare against truncated mass, not blindly against `1`
 * verified the scientific core with `npm test`
 * verified the standard verification pass with `npm run check`
+
+## Maintenance
+
+Verified on April 15, 2026:
+
+* added standard unit and integration test entrypoints to `package.json`
+* added unit tests for coordinate utilities, radial formulas, state metadata, density evaluation, and validation helpers
+* added an integration test for the end-to-end scientific validation runner
+* updated `npm run check` to run build, unit tests, integration tests, and validation
+* documented in `GEMINI.md` that every implementation chunk must add or update both unit and integration coverage

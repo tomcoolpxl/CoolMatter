@@ -2,12 +2,16 @@ import { runCoordinateChecks } from './coordinateChecks.js'
 import { runNodeChecks } from './nodeChecks.js'
 import { runNormalizationChecks } from './normalizationChecks.js'
 
-function main() {
-  const results = [
+export function collectValidationResults() {
+  return [
     ...runCoordinateChecks(),
     ...runNormalizationChecks(),
     ...runNodeChecks(),
   ]
+}
+
+export function runValidation() {
+  const results = collectValidationResults()
 
   for (const result of results) {
     const summary = `${result.pass ? 'PASS' : 'FAIL'} ${result.checkName}`
@@ -20,7 +24,7 @@ function main() {
 }
 
 try {
-  main()
+  runValidation()
 } catch (error) {
   console.error(`Validation failed: ${error.message}`)
   process.exitCode = 1

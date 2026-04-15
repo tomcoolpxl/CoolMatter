@@ -25,11 +25,16 @@ Project rules:
 - Before moving work to `DONE.md`, review the diff, run the required checks, and update docs if the change affected scope or structure.
 - Use the standard npm entrypoints in `package.json` instead of ad hoc commands:
   `npm run dev` or `npm start` for local development,
-  `npm run test` for pure-Node validation,
+  `npm run test:unit` for unit tests,
+  `npm run test:integration` for integration tests,
+  `npm run test` for the full test suite,
+  `npm run validate` for the pure-Node scientific validation script,
   `npm run build` for production build verification,
   `npm run check` to run the standard verification pass before marking work done.
 - For normalization checks over a finite radial cutoff, compare the numerical integral to the expected truncated probability mass for that state and cutoff.
   Do not assume the result should be `1` unless the domain is actually untruncated.
+- Every implementation phase or chunk must add or update both unit and integration tests for the behavior introduced in that chunk.
+- New implementation work is not complete until it is covered by unit and integration tests and `npm run check` passes.
 
 ## 1. Think Before Coding
 
