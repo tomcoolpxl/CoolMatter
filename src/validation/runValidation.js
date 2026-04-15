@@ -1,7 +1,13 @@
 import { runCoordinateChecks } from './coordinateChecks.js'
+import { runNodeChecks } from './nodeChecks.js'
+import { runNormalizationChecks } from './normalizationChecks.js'
 
 function main() {
-  const results = [...runCoordinateChecks()]
+  const results = [
+    ...runCoordinateChecks(),
+    ...runNormalizationChecks(),
+    ...runNodeChecks(),
+  ]
 
   for (const result of results) {
     const summary = `${result.pass ? 'PASS' : 'FAIL'} ${result.checkName}`

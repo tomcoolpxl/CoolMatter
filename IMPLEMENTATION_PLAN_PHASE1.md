@@ -299,6 +299,12 @@ Validation output should report:
 * measured result
 * pass or fail
 
+Normalization note:
+
+* if a check uses a finite radial cutoff, compare against the expected truncated probability mass inside that cutoff
+* do not treat `1` as the automatic reference value unless the integration domain is untruncated
+* include the cutoff and the reference value in the reported result
+
 Verification:
 
 * `npm run validate` works without a browser

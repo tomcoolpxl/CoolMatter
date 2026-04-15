@@ -28,6 +28,8 @@ Project rules:
   `npm run test` for pure-Node validation,
   `npm run build` for production build verification,
   `npm run check` to run the standard verification pass before marking work done.
+- For normalization checks over a finite radial cutoff, compare the numerical integral to the expected truncated probability mass for that state and cutoff.
+  Do not assume the result should be `1` unless the domain is actually untruncated.
 
 ## 1. Think Before Coding
 

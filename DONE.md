@@ -31,3 +31,17 @@ Verified on April 15, 2026:
 * added `start`, `test`, and `check` scripts while keeping the existing Vite defaults
 * pinned the npm version in `packageManager` and documented the required Node floor in `engines`
 * documented the expected npm usage concisely in `GEMINI.md`
+
+## Phase 1 chunk 3
+
+Verified on April 15, 2026:
+
+* implemented explicit `1s` and `2s` radial formulas in `src/physics/hydrogen/radial.js`
+* implemented the `l = 0, m = 0` angular factor in `src/physics/hydrogen/angular.js`
+* added the explicit state registry in `src/physics/hydrogen/states.js`
+* added spherical and Cartesian density evaluators in `src/physics/hydrogen/density.js`
+* added normalization checks in `src/validation/normalizationChecks.js`
+* added radial node metadata and behavior checks in `src/validation/nodeChecks.js`
+* documented that finite-cutoff normalization checks must compare against truncated mass, not blindly against `1`
+* verified the scientific core with `npm test`
+* verified the standard verification pass with `npm run check`
