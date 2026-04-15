@@ -203,3 +203,12 @@ Verified on April 15, 2026:
 * updated the interaction model in `src/scene/createControls.js` to support orbit, pan, zoom, and WASD panning, and documented that model in the UI, README, and `GEMINI.md`
 * extended unit, integration, and Playwright coverage for the new deployment, input, control, and lifecycle behavior
 * verified the complete hardening pass with `npm run check`
+
+## Maintenance
+
+Verified on April 15, 2026:
+
+* resolved the Vite chunk-size warning by splitting `three` into a dedicated `three-vendor` chunk in `vite.config.js`
+* extended `tests/unit/vite-config.test.js` to lock the chunking rule in place
+* removed the now-obsolete deferred optimization note from `TODO.md`
+* re-verified the standard verification pass with `npm run check`
