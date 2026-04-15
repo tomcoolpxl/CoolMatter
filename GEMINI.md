@@ -6,6 +6,8 @@ Do not start a different project unless the course instructions explicitly chang
 Authoritative project files:
 
 - `REQUIREMENTS.md`
+- `DESIGN.md`
+- `IMPLEMENTATION.md`
 - `IMPLEMENTATION_PLAN.md`
 - `TODO.md`
 - `DONE.md`
