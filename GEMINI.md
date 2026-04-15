@@ -36,6 +36,8 @@ Project rules:
   keep `playwright.config.js` as the authoritative e2e config,
   use `npm run preview:e2e` as the local preview server command for browser tests,
   and install the required browser with `npx playwright install chromium` when setting up a fresh environment.
+- GitHub Pages deployment must be validated against the built `dist/` artifact, not just the source `index.html`.
+  Treat the Vite build output as the authoritative deployment artifact for static hosting.
 - For normalization checks over a finite radial cutoff, compare the numerical integral to the expected truncated probability mass for that state and cutoff.
   Do not assume the result should be `1` unless the domain is actually untruncated.
 - Every implementation phase or chunk must add or update both unit and integration tests for the behavior introduced in that chunk, and add or extend Playwright coverage when the browser-facing flow changes.
@@ -49,6 +51,9 @@ Project rules:
 - If `npm run test:e2e` cannot run in the current environment because a local server bind or browser launch is restricted, document that clearly and rerun it in an environment where Playwright is allowed before treating the work as fully verified.
 - If a build emits a non-blocking optimization warning, document the follow-up plan in the phase docs or hardening plan instead of quietly dropping it.
   Keep the current chunk narrow unless the optimization is required for correctness.
+- User-facing controls must be explicit.
+  If camera interaction is orbit-only, say so in the UI and docs.
+  If panning or keyboard movement is supported, test it and document the exact input model.
 
 ## 1. Think Before Coding
 

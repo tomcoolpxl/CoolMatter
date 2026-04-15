@@ -1,25 +1,30 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { build } from 'vite'
 
-const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
+let builtHtml = ''
+
+beforeAll(async () => {
+  await build({
+    root: fileURLToPath(new URL('../../', import.meta.url)),
+    configFile: fileURLToPath(new URL('../../vite.config.js', import.meta.url)),
+    logLevel: 'silent',
+  })
+
+  builtHtml = readFileSync(new URL('../../dist/index.html', import.meta.url), 'utf8')
+})
 
 describe('GitHub Pages contract', () => {
-  it('uses a repository-safe relative module entry for the app', () => {
-    expect(html).not.toContain('src="/src/main.js"')
-    expect(html).toContain('src="./src/main.js"')
-    expect(html).toContain('<div id="app"')
+  it('builds repo-safe relative asset paths for static hosting', () => {
+    expect(builtHtml).toContain('<div id="app"')
+    expect(builtHtml).toContain('src="./assets/')
+    expect(builtHtml).not.toContain('src="/assets/')
   })
 
-  it('includes an import map so GitHub Pages can resolve three.js modules statically', () => {
-    expect(html).toContain('<script type="importmap">')
-    expect(html).toContain('"three"')
-    expect(html).toContain('cdn.jsdelivr.net')
-  })
-
-  it('documents why the app can run on static hosting', () => {
-    expect(html).toContain('<!doctype html>')
-    expect(html).toContain('GitHub Pages can serve the viewer as a static site')
-    expect(html).toContain('hosted under a repository subpath')
+  it('does not ship the source entrypoint path in the built deployment artifact', () => {
+    expect(builtHtml).not.toContain('src="./src/main.js"')
+    expect(builtHtml).not.toContain('<script type="importmap">')
   })
 })

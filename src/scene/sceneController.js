@@ -75,8 +75,14 @@ export function createSceneController({
         config.defaultCameraPosition.y,
         config.defaultCameraPosition.z,
       )
+      controls.target?.set?.(0, 0, 0)
       camera.lookAt(0, 0, 0)
       controls.update()
+    },
+    destroy() {
+      scene.remove(currentPointCloud, currentNucleusMarker)
+      disposeObject3D(currentPointCloud)
+      disposeObject3D(currentNucleusMarker)
     },
   }
 }

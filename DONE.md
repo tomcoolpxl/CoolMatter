@@ -187,3 +187,19 @@ Verified on April 15, 2026:
 * extended Playwright coverage in `tests/e2e/app.spec.js` to verify the diagnostics block in the live browser flow
 * reran the full verification pass and confirmed `npm run check` succeeds for version 1
 * reviewed the deferred build-size warning and left it documented rather than optimizing it now because it is not blocking correctness, static hosting, or version 1 scope
+
+## Maintenance
+
+Verified on April 15, 2026:
+
+* fixed the GitHub Pages deployment contract by adding `vite.config.js` with relative static-hosting asset paths and by treating the Vite-built `dist/` output as the authoritative deployment artifact
+* updated the source `index.html` and README so local entrypoint behavior and built Pages deployment are no longer conflated
+* added build-contract coverage for GitHub Pages in `tests/integration/gh-pages-contract.test.js` and added `tests/unit/vite-config.test.js`
+* fixed first-render sizing in `src/app/createApp.js` by measuring after mount and running an initial resize pass before steady-state rendering
+* added lifecycle teardown support in `src/app/createApp.js` and `src/scene/sceneController.js` for the render loop, listeners, controls, renderer, and live scene objects
+* hardened the validation runner in `src/validation/runValidation.js` so summaries are accurate and returned failed checks cannot silently pass
+* added failure-path validation coverage in `tests/integration/validation-runner.test.js`
+* hardened app-state input handling in `src/ui/appState.js` so invalid UI values are sanitized or clamped instead of crashing the app
+* updated the interaction model in `src/scene/createControls.js` to support orbit, pan, zoom, and WASD panning, and documented that model in the UI, README, and `GEMINI.md`
+* extended unit, integration, and Playwright coverage for the new deployment, input, control, and lifecycle behavior
+* verified the complete hardening pass with `npm run check`

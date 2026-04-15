@@ -60,12 +60,15 @@ export function createControlPanel({
     step: 1,
   })
   const resetCameraButton = documentRef.createElement('button')
+  const controlsHelp = documentRef.createElement('p')
   const diagnosticsSection = documentRef.createElement('section')
   const diagnosticsHeading = documentRef.createElement('h2')
   const diagnosticsBody = documentRef.createElement('dl')
 
   resetCameraButton.type = 'button'
   resetCameraButton.textContent = 'Reset camera'
+  controlsHelp.className = 'controls-help'
+  controlsHelp.textContent = config.controlsHelpText
   diagnosticsSection.className = 'diagnostics'
   diagnosticsHeading.textContent = 'Diagnostics'
   diagnosticsBody.className = 'diagnostics-grid'
@@ -111,6 +114,7 @@ export function createControlPanel({
     opacityInput.field,
     nucleusModeSelect.field,
     seedInput.field,
+    controlsHelp,
     resetCameraButton,
     diagnosticsSection,
   )

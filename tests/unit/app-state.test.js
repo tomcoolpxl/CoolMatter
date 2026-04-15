@@ -52,4 +52,37 @@ describe('app state', () => {
     expect(state.sampleCount).toBe(20000)
     expect(state.seed).toBe(12345)
   })
+
+  it('sanitizes invalid regeneration input instead of crashing state', () => {
+    const appState = createAppState()
+
+    const state = appState.applyRegenerationUpdate({
+      selectedStateId: 'bogus',
+      sampleCount: Number.NaN,
+      seed: -7,
+      truncation: { kind: 'spherical', maxRadius: 0 },
+    })
+
+    expect(state.selectedStateId).toBe('1s')
+    expect(state.sampleCount).toBe(20000)
+    expect(state.seed).toBe(0)
+    expect(state.truncation).toEqual({
+      kind: 'spherical',
+      maxRadius: 12,
+    })
+  })
+
+  it('clamps visual input into valid ranges', () => {
+    const appState = createAppState()
+
+    const state = appState.applyVisualUpdate({
+      pointSize: 0,
+      opacity: 4,
+      nucleusMode: 'invalid',
+    })
+
+    expect(state.pointSize).toBe(0.001)
+    expect(state.opacity).toBe(1)
+    expect(state.nucleusMode).toBe('visibleReference')
+  })
 })

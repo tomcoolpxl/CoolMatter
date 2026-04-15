@@ -11,8 +11,10 @@ describe('GitHub Pages index', () => {
     expect(html).toContain('rho(x, y, z) = |psi_nlm|^2')
   })
 
-  it('includes an app mount and a relative module entry', () => {
+  it('includes an app mount and a Vite module entry without a source import map', () => {
     expect(html).toContain('<div id="app"')
     expect(html).toContain('src="./src/main.js"')
+    expect(html).not.toContain('<script type="importmap">')
+    expect(html).toContain('GitHub Pages should publish the built')
   })
 })

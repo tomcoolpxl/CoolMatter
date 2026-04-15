@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { collectValidationResults } from '../../src/validation/runValidation.js'
+import {
+  assertValidationPassed,
+  collectValidationResults,
+  summarizeValidationResults,
+} from '../../src/validation/runValidation.js'
 
 describe('validation runner', () => {
   it('executes the full scientific validation pipeline successfully', () => {
@@ -19,5 +23,19 @@ describe('validation runner', () => {
     expect(results.some((result) => result.checkName === 'radial histogram (1s)')).toBe(true)
     expect(results.some((result) => result.checkName === 'radial histogram (2s)')).toBe(true)
     expect(results.some((result) => result.checkName === 'invalid truncation failure')).toBe(true)
+  })
+
+  it('fails summaries that contain any failed check result', () => {
+    const summary = summarizeValidationResults([
+      { checkName: 'good', pass: true },
+      { checkName: 'bad', pass: false },
+    ])
+
+    expect(summary).toEqual({
+      totalChecks: 2,
+      passedChecks: 1,
+      failedChecks: ['bad'],
+    })
+    expect(() => assertValidationPassed(summary)).toThrow('Validation checks failed: bad')
   })
 })

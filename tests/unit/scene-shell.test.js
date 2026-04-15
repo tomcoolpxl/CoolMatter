@@ -5,7 +5,11 @@ vi.mock('three/addons/controls/OrbitControls.js', () => {
     constructor(camera, domElement) {
       this.camera = camera
       this.domElement = domElement
-      this.enablePan = true
+      this.enablePan = false
+      this.target = {
+        set: vi.fn(),
+      }
+      this.listenToKeyEvents = vi.fn()
       this.update = vi.fn()
     }
   }
@@ -50,11 +54,19 @@ describe('scene shell factories', () => {
     expect(lights.directionalLight.position.z).toBe(8)
   })
 
-  it('creates orbit controls with panning disabled', async () => {
+  it('creates orbit controls with panning and WASD keyboard support', async () => {
     const { createControls } = await import('../../src/scene/createControls.js')
     const controls = createControls({ id: 'camera' }, { id: 'canvas' })
 
-    expect(controls.enablePan).toBe(false)
+    expect(controls.target.set).toHaveBeenCalledWith(0, 0, 0)
+    expect(controls.enablePan).toBe(true)
+    expect(controls.keys).toEqual({
+      LEFT: 'KeyA',
+      UP: 'KeyW',
+      RIGHT: 'KeyD',
+      BOTTOM: 'KeyS',
+    })
+    expect(controls.listenToKeyEvents).toHaveBeenCalledWith(window)
     expect(controls.update).toHaveBeenCalledOnce()
   })
 

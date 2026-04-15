@@ -17,3 +17,7 @@ export function disposeObject3D(object) {
 
   object.material?.dispose?.()
 }
+
+export function disposeRenderer(renderer) {
+  renderer?.dispose?.()
+}

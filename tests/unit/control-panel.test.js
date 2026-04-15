@@ -65,6 +65,7 @@ describe('control panel', () => {
       { nucleusMode: 'physical' },
     ])
     expect(resetCamera).toHaveBeenCalledOnce()
+    expect(panel.element.children.some((child) => child.textContent === 'Drag to orbit, right-drag or WASD to pan, and scroll to zoom.')).toBe(true)
   })
 
   it('updates the diagnostics block when asked', () => {

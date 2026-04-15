@@ -6,6 +6,7 @@ const setSize = vi.fn()
 const rendererDomElement = { tagName: 'CANVAS' }
 const controlsUpdate = vi.fn()
 const sceneAdd = vi.fn()
+const sceneRemove = vi.fn()
 const sceneController = {
   getCurrentObjects: vi.fn(() => ({
     pointCloud: { kind: 'points' },
@@ -21,6 +22,7 @@ const sceneController = {
   applyRegenerationUpdate: vi.fn(),
   applyVisualUpdate: vi.fn(),
   resetCamera: vi.fn(),
+  destroy: vi.fn(),
 }
 const createSceneController = vi.fn(() => sceneController)
 const appState = {
@@ -79,6 +81,7 @@ const createControlPanel = vi.fn((options) => {
 vi.mock('../../src/scene/createScene.js', () => ({
   createScene: () => ({
     add: sceneAdd,
+    remove: sceneRemove,
   }),
 }))
 
@@ -86,6 +89,7 @@ vi.mock('../../src/scene/createCamera.js', () => ({
   createCamera: ({ width, height }) => ({
     width,
     height,
+    updateProjectionMatrix: vi.fn(),
   }),
 }))
 
@@ -132,6 +136,7 @@ describe('app bootstrap', () => {
     setSize.mockReset()
     controlsUpdate.mockReset()
     sceneAdd.mockReset()
+    sceneRemove.mockReset()
     createAppState.mockClear()
     createSceneController.mockClear()
     createControlPanel.mockClear()
@@ -143,6 +148,7 @@ describe('app bootstrap', () => {
     sceneController.applyRegenerationUpdate.mockClear()
     sceneController.applyVisualUpdate.mockClear()
     sceneController.resetCamera.mockClear()
+    sceneController.destroy.mockClear()
     controlPanelUpdateDiagnostics.mockClear()
     viewportElement.className = ''
     viewportElement.children = []
@@ -153,8 +159,10 @@ describe('app bootstrap', () => {
     global.window = {
       innerWidth: 1280,
       innerHeight: 720,
-      requestAnimationFrame: vi.fn(),
+      requestAnimationFrame: vi.fn(() => 99),
+      cancelAnimationFrame: vi.fn(),
       addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
       devicePixelRatio: 2,
     }
   })
@@ -178,6 +186,7 @@ describe('app bootstrap', () => {
     expect(render).toHaveBeenCalledOnce()
     expect(controlsUpdate).toHaveBeenCalledOnce()
     expect(window.requestAnimationFrame).toHaveBeenCalledOnce()
+    expect(setSize).toHaveBeenCalledWith(800, 600)
     expect(createAppState).toHaveBeenCalledOnce()
     expect(createSceneController).toHaveBeenCalledOnce()
     expect(createControlPanel).toHaveBeenCalledOnce()
@@ -236,12 +245,36 @@ describe('app bootstrap', () => {
 
     viewportElement.clientWidth = 640
     viewportElement.clientHeight = 360
-    app.camera.updateProjectionMatrix = vi.fn()
     app.handleResize()
 
     expect(app.camera.aspect).toBeCloseTo(640 / 360, 12)
-    expect(app.camera.updateProjectionMatrix).toHaveBeenCalledOnce()
-    expect(setPixelRatio).toHaveBeenCalledWith(2)
-    expect(setSize).toHaveBeenCalledWith(640, 360)
+    expect(app.camera.updateProjectionMatrix).toHaveBeenCalledTimes(2)
+    expect(setPixelRatio).toHaveBeenLastCalledWith(2)
+    expect(setSize).toHaveBeenLastCalledWith(640, 360)
+  })
+
+  it('tears down the render loop, listener, controls, renderer, and scene controller', async () => {
+    const root = {
+      clientWidth: 800,
+      clientHeight: 600,
+      ownerDocument: {
+        createElement: vi.fn(() => viewportElement),
+      },
+      replaceChildren: vi.fn(),
+    }
+    const { createApp } = await import('../../src/app/createApp.js')
+
+    const app = createApp(root)
+    app.controls.dispose = vi.fn()
+    app.renderer.dispose = vi.fn()
+    const frameId = window.requestAnimationFrame.mock.results[0].value
+
+    app.destroy()
+
+    expect(window.cancelAnimationFrame).toHaveBeenCalledWith(frameId)
+    expect(window.removeEventListener).toHaveBeenCalledWith('resize', app.handleResize)
+    expect(sceneController.destroy).toHaveBeenCalledOnce()
+    expect(app.controls.dispose).toHaveBeenCalledOnce()
+    expect(app.renderer.dispose).toHaveBeenCalledOnce()
   })
 })

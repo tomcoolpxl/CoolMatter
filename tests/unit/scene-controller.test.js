@@ -44,7 +44,7 @@ describe('scene controller', () => {
       add: vi.fn(),
       remove: vi.fn(),
     }
-    const controls = { update: vi.fn() }
+    const controls = { update: vi.fn(), target: { set: vi.fn() } }
     const camera = {
       position: { set: vi.fn() },
       lookAt: vi.fn(),
@@ -89,7 +89,7 @@ describe('scene controller', () => {
       add: vi.fn(),
       remove: vi.fn(),
     }
-    const controls = { update: vi.fn() }
+    const controls = { update: vi.fn(), target: { set: vi.fn() } }
     const camera = {
       position: { set: vi.fn() },
       lookAt: vi.fn(),
@@ -144,7 +144,7 @@ describe('scene controller', () => {
       add: vi.fn(),
       remove: vi.fn(),
     }
-    const controls = { update: vi.fn() }
+    const controls = { update: vi.fn(), target: { set: vi.fn() } }
     const camera = {
       position: { set: vi.fn() },
       lookAt: vi.fn(),
@@ -183,7 +183,49 @@ describe('scene controller', () => {
     expect(disposeObject3D).toHaveBeenCalledWith(initialNucleus)
     expect(scene.add).toHaveBeenCalledWith(physicalNucleus)
     expect(camera.position.set).toHaveBeenCalled()
+    expect(controls.target.set).toHaveBeenCalledWith(0, 0, 0)
     expect(camera.lookAt).toHaveBeenCalledWith(0, 0, 0)
     expect(controls.update).toHaveBeenCalled()
+  })
+
+  it('disposes current scene objects on destroy', async () => {
+    sampleHydrogenState.mockReturnValue({
+      positions: new Float32Array([0, 0, 0]),
+      metadata: { id: 1 },
+    })
+    const pointCloud = { material: {} }
+    const nucleus = { kind: 'nucleus' }
+    createElectronPointCloud.mockReturnValue(pointCloud)
+    createNucleusMarker.mockReturnValue(nucleus)
+    const scene = {
+      add: vi.fn(),
+      remove: vi.fn(),
+    }
+    const controls = { update: vi.fn(), target: { set: vi.fn() } }
+    const camera = {
+      position: { set: vi.fn() },
+      lookAt: vi.fn(),
+    }
+    const { createSceneController } = await import('../../src/scene/sceneController.js')
+    const controller = createSceneController({
+      scene,
+      camera,
+      controls,
+      initialState: {
+        selectedStateId: '1s',
+        sampleCount: 1,
+        pointSize: 0.1,
+        opacity: 0.25,
+        nucleusMode: 'visibleReference',
+        seed: 3,
+        truncation: { kind: 'spherical', maxRadius: 4 },
+      },
+    })
+
+    controller.destroy()
+
+    expect(scene.remove).toHaveBeenCalledWith(pointCloud, nucleus)
+    expect(disposeObject3D).toHaveBeenCalledWith(pointCloud)
+    expect(disposeObject3D).toHaveBeenCalledWith(nucleus)
   })
 })

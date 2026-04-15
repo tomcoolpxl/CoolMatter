@@ -130,6 +130,13 @@
         cursor: pointer;
       }
 
+      .controls-help {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+        font-size: 0.92rem;
+      }
+
       canvas {
         display: block;
         width: 100%;
@@ -168,14 +175,6 @@
         }
       }
     </style>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.js",
-          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/"
-        }
-      }
-    </script>
   </head>
   <body>
     <div class="shell">
@@ -185,8 +184,8 @@
           <h1>Validated Hydrogen Orbital Viewer</h1>
         </div>
         <p>
-          This page mounts the actual app directly from the repository source with a browser import map,
-          so GitHub Pages can serve the viewer as a static site without a custom runtime adapter.
+          This file is the Vite app entrypoint. GitHub Pages should publish the built <code>dist/</code>
+          output so the viewer loads with repository-safe asset paths.
         </p>
       </header>
 
@@ -199,9 +198,9 @@
       </section>
 
       <p class="footnote">
-        GitHub Pages path safety:
-        the module entry uses the relative path <code>./src/main.js</code> instead of an absolute root path,
-        so the app still loads when the site is hosted under a repository subpath.
+        Local entrypoint:
+        Vite loads the app from <code>./src/main.js</code> during development and rewrites the final asset
+        paths during <code>npm run build</code> for static hosting.
       </p>
     </div>
 

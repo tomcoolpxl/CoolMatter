@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { disposeObject3D } from '../../src/utils/dispose.js'
+import { disposeObject3D, disposeRenderer } from '../../src/utils/dispose.js'
 
 describe('disposeObject3D', () => {
   it('disposes geometry and a single material', () => {
@@ -32,5 +32,13 @@ describe('disposeObject3D', () => {
     expect(geometryDispose).toHaveBeenCalledOnce()
     expect(firstDispose).toHaveBeenCalledOnce()
     expect(secondDispose).toHaveBeenCalledOnce()
+  })
+
+  it('disposes a renderer when requested', () => {
+    const rendererDispose = vi.fn()
+
+    disposeRenderer({ dispose: rendererDispose })
+
+    expect(rendererDispose).toHaveBeenCalledOnce()
   })
 })

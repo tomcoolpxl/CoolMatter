@@ -81,11 +81,19 @@ export function createApp(root) {
   }
 
   window.addEventListener('resize', handleResize)
+  handleResize()
+
+  let animationFrameId = null
+  let isDestroyed = false
 
   function renderFrame() {
+    if (isDestroyed) {
+      return
+    }
+
     controls.update()
     renderer.render(scene, camera)
-    window.requestAnimationFrame(renderFrame)
+    animationFrameId = window.requestAnimationFrame(renderFrame)
   }
 
   renderFrame()
@@ -107,5 +115,18 @@ export function createApp(root) {
     electronPointCloud: sceneController.getCurrentObjects().pointCloud,
     nucleusMarker: sceneController.getCurrentObjects().nucleusMarker,
     initialSample: sceneController.getCurrentSample(),
+    destroy() {
+      isDestroyed = true
+
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame?.(animationFrameId)
+      }
+
+      window.removeEventListener?.('resize', handleResize)
+      sceneController.destroy?.()
+      scene.remove(ambientLight, directionalLight)
+      controls.dispose?.()
+      renderer.dispose?.()
+    },
   }
 }
