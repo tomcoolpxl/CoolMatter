@@ -82,6 +82,44 @@ describe('app state', () => {
     })
   })
 
+  it('normalizes valid superpositions to unit total weight', () => {
+    const appState = createAppState()
+
+    const state = appState.applyRegenerationUpdate({
+      superposition: [
+        { n: 1, l: 0, m: 0, magnitude: 3, phase: 0 },
+        { n: 2, l: 0, m: 0, magnitude: 4, phase: 1 },
+      ],
+    })
+
+    expect(state.superposition[0].magnitude).toBeCloseTo(0.6)
+    expect(state.superposition[1].magnitude).toBeCloseTo(0.8)
+  })
+
+  it('rejects zero-norm superpositions and keeps the previous valid state', () => {
+    const appState = createAppState()
+
+    appState.applyRegenerationUpdate({
+      superposition: [
+        { n: 1, l: 0, m: 0, magnitude: 1, phase: 0 },
+        { n: 2, l: 0, m: 0, magnitude: 1, phase: 0 },
+      ],
+    })
+
+    const state = appState.applyRegenerationUpdate({
+      superposition: [
+        { n: 1, l: 0, m: 0, magnitude: 0, phase: 0 },
+        { n: 2, l: 0, m: 0, magnitude: 0, phase: 0 },
+      ],
+    })
+
+    expect(state.superposition).toHaveLength(2)
+    expect(state.superposition[0]).toMatchObject({ n: 1, l: 0, m: 0, phase: 0 })
+    expect(state.superposition[1]).toMatchObject({ n: 2, l: 0, m: 0, phase: 0 })
+    expect(state.superposition[0].magnitude).toBeCloseTo(Math.SQRT1_2)
+    expect(state.superposition[1].magnitude).toBeCloseTo(Math.SQRT1_2)
+  })
+
   it('clamps visual input into valid ranges', () => {
     const appState = createAppState()
 

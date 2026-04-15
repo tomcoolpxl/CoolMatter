@@ -92,16 +92,19 @@ export function createControlPanel({
 
       magSlider.input.addEventListener('input', () => {
         currentSuperposition[i].magnitude = Number(magSlider.input.value)
-        onRegenerationUpdate({ superposition: currentSuperposition })
+        const nextState = onRegenerationUpdate({ superposition: currentSuperposition })
+        currentSuperposition = [...(nextState?.superposition || currentSuperposition)]
         renderSuperpositionList()
       })
       phaseSlider.input.addEventListener('input', () => {
         currentSuperposition[i].phase = Number(phaseSlider.input.value)
-        onRegenerationUpdate({ superposition: currentSuperposition })
+        const nextState = onRegenerationUpdate({ superposition: currentSuperposition })
+        currentSuperposition = [...(nextState?.superposition || currentSuperposition)]
       })
       removeBtn.addEventListener('click', () => {
         currentSuperposition.splice(i, 1)
-        onRegenerationUpdate({ superposition: currentSuperposition })
+        const nextState = onRegenerationUpdate({ superposition: currentSuperposition })
+        currentSuperposition = [...(nextState?.superposition || currentSuperposition)]
         renderSuperpositionList()
       })
 
@@ -126,7 +129,8 @@ export function createControlPanel({
 
     if (n > 0 && l >= 0 && l < n && m >= -l && m <= l) {
       currentSuperposition.push({ n, l, m, magnitude: 1, phase: 0 })
-      onRegenerationUpdate({ superposition: currentSuperposition })
+      const nextState = onRegenerationUpdate({ superposition: currentSuperposition })
+      currentSuperposition = [...(nextState?.superposition || currentSuperposition)]
       renderSuperpositionList()
     }
   })

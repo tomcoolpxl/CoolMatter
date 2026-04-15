@@ -136,13 +136,16 @@ function sanitizeSuperposition(value, fallback) {
   )
   if (valid.length === 0) return fallback
 
-  // Normalize
+  // Normalize. Reject zero-norm mixes because they produce zero density everywhere
+  // and break rejection-sampling bounds.
   let sumSq = 0
   for (const comp of valid) sumSq += comp.magnitude * comp.magnitude
-  if (sumSq > 0) {
-    const invNorm = 1.0 / Math.sqrt(sumSq)
-    for (const comp of valid) comp.magnitude *= invNorm
+  if (sumSq <= 0) {
+    return fallback
   }
+
+  const invNorm = 1.0 / Math.sqrt(sumSq)
+  for (const comp of valid) comp.magnitude *= invNorm
   return valid
 }
 
