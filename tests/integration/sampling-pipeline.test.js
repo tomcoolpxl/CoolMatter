@@ -4,8 +4,33 @@ import { config } from '../../src/app/config.js'
 import { sampleHydrogenState } from '../../src/sampling/sampleHydrogenState.js'
 import { createSphericalTruncation } from '../../src/sampling/truncation.js'
 import { collectValidationResults } from '../../src/validation/runValidation.js'
+import { resampleBatch } from '../../src/sampling/streamingSampler.js'
+import { createSeededRng } from '../../src/sampling/rng.js'
 
 describe('sampling pipeline', () => {
+  it('scintillation resampleBatch mutates existing buffer dynamically', () => {
+    const superposition = [{ n: 1, l: 0, m: 0, magnitude: 1, phase: 0 }]
+    const truncation = createSphericalTruncation(10)
+    const rng = createSeededRng(12345)
+    
+    // Setup a small buffer of just 10 points
+    const positions = new Float32Array(30)
+    positions.fill(1.0)
+    
+    resampleBatch(positions, superposition, 0, 5, truncation, rng)
+    
+    // We expect 5 points (15 floats) to be mutated to non-1.0 values
+    let mutated = 0
+    for(let i = 0; i < 30; i+=3) {
+      if (positions[i] !== 1.0 || positions[i+1] !== 1.0 || positions[i+2] !== 1.0) {
+        mutated++
+      }
+    }
+    
+    expect(mutated).toBeGreaterThan(0)
+    expect(mutated).toBeLessThanOrEqual(5)
+  })
+
   it('produces a reproducible sampled pipeline boundary for the default state', () => {
     const sample = sampleHydrogenState({
       stateId: '1s',

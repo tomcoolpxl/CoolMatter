@@ -1,3 +1,12 @@
+n## Version 2 Phase 3 & 4 (Completed)
+- Transformed static buffer array into `THREE.DynamicDrawUsage` streaming buffer update loop for 60fps Scintillation.
+- Implemented `resampleBatch` mutating subsets of float buffers per-frame using physics evaluation at time `t`.
+- Integrated time clock slider scale and playback toggle connecting directly to simulation.
+- Added purely native Phase 4 Math implementations bridging `evaluateLegendre` and `evaluateLaguerre` natively into GLSL `hydrogenCore.js` using unrolled loops (<=20 max steps).
+- Added `volumetric.js` ShaderMaterial fragment running a 80-step raymarch computing native `|Psi|^2` densities across superimposed wave-states iteratively on the GPU.
+- Enabled realtime Render Mode dropdown toggle directly attached via WebGL components unmounting Point Cloud buffers in favor of Bounding Boxes instantly.
+- Updated Tests for dynamic arrays constraints passing validation suites.
+
 # Done
 
 ## Version 2 - Phase 1 chunk 1

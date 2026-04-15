@@ -175,6 +175,15 @@ export function createControlPanel({
       { value: 'physical', text: 'Physical scale' },
     ],
   })
+  const renderModeSelect = createSelectControl(documentRef, {
+    id: 'render-mode-select',
+    labelText: 'Render mode',
+    value: state.renderMode ?? 'point_cloud',
+    options: [
+      { value: 'point_cloud', text: 'Point Cloud' },
+      { value: 'volumetric', text: 'Volumetric (GLSL)' },
+    ],
+  })
   const seedInput = createNumberControl(documentRef, {
     id: 'seed-input',
     labelText: 'Seed',
@@ -212,6 +221,9 @@ export function createControlPanel({
   nucleusModeSelect.input.addEventListener('change', () => {
     onVisualUpdate({ nucleusMode: nucleusModeSelect.input.value })
   })
+  renderModeSelect.input.addEventListener('change', () => {
+    onVisualUpdate({ renderMode: renderModeSelect.input.value })
+  })
   seedInput.input.addEventListener('change', () => {
     onRegenerationUpdate({ seed: Number(seedInput.input.value) })
   })
@@ -226,6 +238,7 @@ export function createControlPanel({
     pointSizeInput.field,
     opacityInput.field,
     scintillationRateInput.field,
+      renderModeSelect.field,
     nucleusModeSelect.field,
     seedInput.field,
     controlsHelp,

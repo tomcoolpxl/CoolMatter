@@ -6,6 +6,8 @@ import { resampleBatch } from '../sampling/streamingSampler.js'
 import { createSeededRng } from '../sampling/rng.js'
 import { disposeObject3D } from '../utils/dispose.js'
 
+import { createVolumetricCloud } from '../renderables/createVolumetricCloud.js'
+
 export function createSceneController({
   scene,
   camera,
@@ -15,11 +17,18 @@ export function createSceneController({
   let currentState = cloneState(initialState)
   let currentSample = sampleCurrentState(currentState)
   let currentPointCloud = createElectronPointCloud(currentSample.positions)
+  let currentVolumetricCloud = createVolumetricCloud()
   let currentNucleusMarker = createNucleusMarker(currentState.nucleusMode)
   let streamingRng = createSeededRng(Math.floor(Math.random() * 0xffffffff))
 
   applyPointCloudVisuals(currentPointCloud, currentState)
-  scene.add(currentPointCloud, currentNucleusMarker)
+  applyVolumetricVisuals(currentVolumetricCloud, currentState)
+  
+  if (currentState.renderMode === 'volumetric') {
+    scene.add(currentVolumetricCloud, currentNucleusMarker)
+  } else {
+    scene.add(currentPointCloud, currentNucleusMarker)
+  }
 
   return {
     getCurrentState() {
@@ -41,22 +50,43 @@ export function createSceneController({
       const nextPointCloud = createElectronPointCloud(currentSample.positions)
 
       applyPointCloudVisuals(nextPointCloud, currentState)
-      scene.remove(currentPointCloud)
-      disposeObject3D(currentPointCloud)
-      scene.add(nextPointCloud)
+      applyVolumetricVisuals(currentVolumetricCloud, currentState)
+
+      if (currentState.renderMode !== 'volumetric') {
+        scene.remove(currentPointCloud)
+        disposeObject3D(currentPointCloud)
+        scene.add(nextPointCloud)
+      } else {
+        scene.remove(currentPointCloud)
+        disposeObject3D(currentPointCloud)
+      }
+      
       currentPointCloud = nextPointCloud
 
       return {
         sample: currentSample,
         pointCloud: currentPointCloud,
+        volumetricCloud: currentVolumetricCloud,
         nucleusMarker: currentNucleusMarker,
       }
     },
     applyVisualUpdate(nextState) {
       const previousNucleusMode = currentState.nucleusMode
+      const previousRenderMode = currentState.renderMode
 
       currentState = cloneState(nextState)
       applyPointCloudVisuals(currentPointCloud, currentState)
+      applyVolumetricVisuals(currentVolumetricCloud, currentState)
+
+      if (currentState.renderMode !== previousRenderMode) {
+        if (currentState.renderMode === 'volumetric') {
+          scene.remove(currentPointCloud)
+          scene.add(currentVolumetricCloud)
+        } else {
+          scene.remove(currentVolumetricCloud)
+          scene.add(currentPointCloud)
+        }
+      }
 
       if (currentState.nucleusMode !== previousNucleusMode) {
         const nextNucleusMarker = createNucleusMarker(currentState.nucleusMode)
@@ -69,6 +99,7 @@ export function createSceneController({
 
       return {
         pointCloud: currentPointCloud,
+        volumetricCloud: currentVolumetricCloud,
         nucleusMarker: currentNucleusMarker,
       }
     },
@@ -77,7 +108,7 @@ export function createSceneController({
       // If we are paused, delta used for physics might be zero, or we might skip.
       currentState.time = time
       
-      const isScintillating = currentState.scintillationRate > 0
+      const isScintillating = currentState.scintillationRate > 0 && currentState.renderMode === 'point_cloud'
       // Always allow scintillation even if paused, so users can see the point cloud
       // re-evaluate against the static |Psi|^2 at the frozen t!
       // But usually time is frozen so the distribution doesn't shift, it just scrambles.
@@ -98,6 +129,11 @@ export function createSceneController({
         }
       }
 
+      // Update volumetric cloud time
+      if (currentVolumetricCloud.material.uniforms?.time) {
+        currentVolumetricCloud.material.uniforms.time.value = time
+      }
+
       // Scaffolding for when we migrate to ShaderMaterial
       if (currentPointCloud.material.uniforms?.time) {
         currentPointCloud.material.uniforms.time.value = time
@@ -114,14 +150,16 @@ export function createSceneController({
       controls.update()
     },
     destroy() {
-      scene.remove(currentPointCloud, currentNucleusMarker)
+      scene.remove(currentPointCloud, currentNucleusMarker, currentVolumetricCloud)
       disposeObject3D(currentPointCloud)
       disposeObject3D(currentNucleusMarker)
+      disposeObject3D(currentVolumetricCloud)
     },
   }
 }
 
 function sampleCurrentState(state) {
+
   // If the sampler still only takes a stateId for now, we use the first component's ID heuristically
   // or we need to pass superposition if the sampler supports it. 
   // Let's pass superposition instead, and let sampleHydrogenState deal with it if we upgrade it,
@@ -148,6 +186,27 @@ function applyPointCloudVisuals(pointCloud, state) {
     pointCloud.material.opacity = state.opacity
   }
   pointCloud.material.needsUpdate = true
+}
+
+function applyVolumetricVisuals(volumetricCloud, state) {
+  if (!volumetricCloud || !volumetricCloud.material.uniforms) return
+  
+  const uniforms = volumetricCloud.material.uniforms
+  
+  if (state.time !== undefined) {
+    uniforms.time.value = state.time
+  }
+  
+  uniforms.activeStates.value = Math.min(state.superposition.length, 4)
+  
+  for (let i = 0; i < uniforms.activeStates.value; i++) {
+    const comp = state.superposition[i]
+    uniforms.u_n.value[i] = comp.n
+    uniforms.u_l.value[i] = comp.l
+    uniforms.u_m.value[i] = comp.m
+    uniforms.u_weights.value[i*2] = comp.magnitude * Math.cos(comp.phase)
+    uniforms.u_weights.value[i*2 + 1] = comp.magnitude * Math.sin(comp.phase)
+  }
 }
 
 function cloneState(state) {

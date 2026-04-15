@@ -224,8 +224,9 @@ describe('scene controller', () => {
 
     controller.destroy()
 
-    expect(scene.remove).toHaveBeenCalledWith(pointCloud, nucleus)
+    expect(scene.remove).toHaveBeenCalledWith(pointCloud, nucleus, expect.anything())
     expect(disposeObject3D).toHaveBeenCalledWith(pointCloud)
     expect(disposeObject3D).toHaveBeenCalledWith(nucleus)
+    expect(disposeObject3D).toHaveBeenCalledWith(expect.anything())
   })
 })
