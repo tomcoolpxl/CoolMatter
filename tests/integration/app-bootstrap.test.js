@@ -54,13 +54,25 @@ const appState = {
 }
 const createAppState = vi.fn(() => appState)
 const controlPanelElement = { tagName: 'ASIDE' }
+const viewportElement = {
+  tagName: 'DIV',
+  className: '',
+  children: [],
+  clientWidth: 0,
+  clientHeight: 0,
+  append: vi.fn(function append(child) {
+    this.children.push(child)
+  }),
+}
 let capturedControlPanelOptions
+const controlPanelUpdateDiagnostics = vi.fn()
 const createControlPanel = vi.fn((options) => {
   capturedControlPanelOptions = options
 
   return {
     element: controlPanelElement,
     controls: {},
+    updateDiagnostics: controlPanelUpdateDiagnostics,
   }
 })
 
@@ -131,6 +143,12 @@ describe('app bootstrap', () => {
     sceneController.applyRegenerationUpdate.mockClear()
     sceneController.applyVisualUpdate.mockClear()
     sceneController.resetCamera.mockClear()
+    controlPanelUpdateDiagnostics.mockClear()
+    viewportElement.className = ''
+    viewportElement.children = []
+    viewportElement.clientWidth = 0
+    viewportElement.clientHeight = 0
+    viewportElement.append.mockClear()
     capturedControlPanelOptions = undefined
     global.window = {
       innerWidth: 1280,
@@ -145,13 +163,18 @@ describe('app bootstrap', () => {
     const root = {
       clientWidth: 800,
       clientHeight: 600,
+      ownerDocument: {
+        createElement: vi.fn(() => viewportElement),
+      },
       replaceChildren: vi.fn(),
     }
     const { createApp } = await import('../../src/app/createApp.js')
 
     const app = createApp(root)
 
-    expect(root.replaceChildren).toHaveBeenCalledWith(controlPanelElement, rendererDomElement)
+    expect(viewportElement.className).toBe('viewer-frame')
+    expect(viewportElement.append).toHaveBeenCalledWith(rendererDomElement)
+    expect(root.replaceChildren).toHaveBeenCalledWith(controlPanelElement, viewportElement)
     expect(render).toHaveBeenCalledOnce()
     expect(controlsUpdate).toHaveBeenCalledOnce()
     expect(window.requestAnimationFrame).toHaveBeenCalledOnce()
@@ -159,6 +182,7 @@ describe('app bootstrap', () => {
     expect(createSceneController).toHaveBeenCalledOnce()
     expect(createControlPanel).toHaveBeenCalledOnce()
     expect(window.addEventListener).toHaveBeenCalledWith('resize', app.handleResize)
+    expect(createControlPanel.mock.calls[0][0].diagnostics.validationCheckCount).toBe(18)
     expect(sceneAdd).toHaveBeenCalledWith(
       { type: 'ambient' },
       { type: 'directional' },
@@ -166,6 +190,7 @@ describe('app bootstrap', () => {
     expect(app.appState).toBe(appState)
     expect(app.sceneController).toBe(sceneController)
     expect(app.controlPanel.element).toBe(controlPanelElement)
+    expect(app.viewport).toBe(viewportElement)
     expect(app.electronPointCloud).toEqual({ kind: 'points' })
     expect(app.nucleusMarker).toEqual({ kind: 'nucleus' })
     expect(app.renderer.domElement).toBe(rendererDomElement)
@@ -175,6 +200,9 @@ describe('app bootstrap', () => {
     const root = {
       clientWidth: 800,
       clientHeight: 600,
+      ownerDocument: {
+        createElement: vi.fn(() => viewportElement),
+      },
       replaceChildren: vi.fn(),
     }
     const { createApp } = await import('../../src/app/createApp.js')
@@ -187,6 +215,7 @@ describe('app bootstrap', () => {
 
     expect(appState.applyRegenerationUpdate).toHaveBeenCalledWith({ sampleCount: 1500 })
     expect(sceneController.applyRegenerationUpdate).toHaveBeenCalledOnce()
+    expect(controlPanelUpdateDiagnostics).toHaveBeenCalled()
     expect(appState.applyVisualUpdate).toHaveBeenCalledWith({ opacity: 0.55 })
     expect(sceneController.applyVisualUpdate).toHaveBeenCalledOnce()
     expect(sceneController.resetCamera).toHaveBeenCalledOnce()
@@ -196,14 +225,17 @@ describe('app bootstrap', () => {
     const root = {
       clientWidth: 900,
       clientHeight: 500,
+      ownerDocument: {
+        createElement: vi.fn(() => viewportElement),
+      },
       replaceChildren: vi.fn(),
     }
     const { createApp } = await import('../../src/app/createApp.js')
 
     const app = createApp(root)
 
-    root.clientWidth = 640
-    root.clientHeight = 360
+    viewportElement.clientWidth = 640
+    viewportElement.clientHeight = 360
     app.camera.updateProjectionMatrix = vi.fn()
     app.handleResize()
 

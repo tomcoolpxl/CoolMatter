@@ -9,9 +9,12 @@ test('loads the app shell and interactive controls', async ({ page }) => {
   await expect(page.locator('canvas')).toBeVisible()
   await expect(page.getByLabel('State')).toHaveValue('1s')
   await expect(page.getByLabel('Nucleus mode')).toHaveValue('visibleReference')
+  await expect(page.getByText('Diagnostics')).toBeVisible()
+  await expect(page.getByText('Offline validation required before signoff')).toBeVisible()
 
   await page.getByLabel('State').selectOption('2s')
   await expect(page.getByLabel('State')).toHaveValue('2s')
+  await expect(page.locator('.diagnostics')).toContainText('2s')
 
   await page.getByLabel('Point size').fill('0.12')
   await expect(page.getByLabel('Point size')).toHaveValue('0.12')

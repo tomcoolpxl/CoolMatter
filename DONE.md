@@ -174,3 +174,16 @@ Verified on April 15, 2026:
 * extended unit coverage for scene-controller disposal behavior in `tests/unit/scene-controller.test.js`
 * extended integration coverage for resize ownership in `tests/integration/app-bootstrap.test.js`
 * verified `npm run check` including unit, integration, Playwright, and validation flows
+
+## Phase 4 chunk 2
+
+Verified on April 15, 2026:
+
+* added minimal developer-facing diagnostics for current state, sample metadata, and validation context in `src/ui/controlPanel.js`
+* updated `src/app/createApp.js` to keep diagnostics synchronized with state and regeneration updates
+* added the shared validation summary manifest in `src/validation/manifest.js`
+* extended unit coverage for diagnostics updates in `tests/unit/control-panel.test.js`
+* extended integration coverage for diagnostics wiring and viewport ownership in `tests/integration/app-bootstrap.test.js`
+* extended Playwright coverage in `tests/e2e/app.spec.js` to verify the diagnostics block in the live browser flow
+* reran the full verification pass and confirmed `npm run check` succeeds for version 1
+* reviewed the deferred build-size warning and left it documented rather than optimizing it now because it is not blocking correctness, static hosting, or version 1 scope

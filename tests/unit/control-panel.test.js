@@ -18,6 +18,17 @@ describe('control panel', () => {
         seed: 12345,
         truncation: { kind: 'spherical', maxRadius: 12 },
       },
+      diagnostics: {
+        selectedStateId: '1s',
+        sampleCount: 20000,
+        seed: 12345,
+        truncationRadius: 12,
+        latestSampleStateId: '1s',
+        latestSampleAttemptCount: 44,
+        validationStatus: 'Offline validation required before signoff',
+        validationCheckCount: 18,
+        validationCommand: 'npm run validate',
+      },
       onRegenerationUpdate(update) {
         regenerationUpdates.push(update)
       },
@@ -55,17 +66,65 @@ describe('control panel', () => {
     ])
     expect(resetCamera).toHaveBeenCalledOnce()
   })
+
+  it('updates the diagnostics block when asked', () => {
+    const panel = createControlPanel({
+      state: {
+        selectedStateId: '1s',
+        sampleCount: 20000,
+        pointSize: 0.04,
+        opacity: 0.2,
+        nucleusMode: 'visibleReference',
+        seed: 12345,
+        truncation: { kind: 'spherical', maxRadius: 12 },
+      },
+      diagnostics: {
+        selectedStateId: '1s',
+        sampleCount: 20000,
+        seed: 12345,
+        truncationRadius: 12,
+        latestSampleStateId: '1s',
+        latestSampleAttemptCount: 44,
+        validationStatus: 'Offline validation required before signoff',
+        validationCheckCount: 18,
+        validationCommand: 'npm run validate',
+      },
+      onRegenerationUpdate() {},
+      onVisualUpdate() {},
+      onResetCamera() {},
+      documentRef: createFakeDocument(),
+    })
+
+    panel.updateDiagnostics({
+      selectedStateId: '2s',
+      sampleCount: 1500,
+      seed: 77,
+      truncationRadius: 8,
+      latestSampleStateId: '2s',
+      latestSampleAttemptCount: 19,
+      validationStatus: 'Offline validation required before signoff',
+      validationCheckCount: 18,
+      validationCommand: 'npm run validate',
+    })
+
+    const diagnosticsSection = panel.element.children.at(-1)
+    const diagnosticsValues = diagnosticsSection.children[1].children
+
+    expect(diagnosticsSection.className).toBe('diagnostics')
+    expect(diagnosticsValues.some((child) => child.textContent === '2s')).toBe(true)
+    expect(diagnosticsValues.some((child) => child.textContent === '19')).toBe(true)
+  })
 })
 
 function createFakeDocument() {
   return {
     createElement(tagName) {
-      return createFakeElement(tagName)
+      return createFakeElement(tagName, this)
     },
   }
 }
 
-function createFakeElement(tagName) {
+function createFakeElement(tagName, ownerDocument) {
   return {
     tagName,
     children: [],
@@ -78,8 +137,13 @@ function createFakeElement(tagName) {
     min: '',
     max: '',
     step: '',
+    ownerDocument,
     append(...children) {
       this.children.push(...children)
+    },
+    replaceChildren(...children) {
+      this.children = []
+      this.append(...children)
     },
     addEventListener(type, listener) {
       this.listeners[type] = listener

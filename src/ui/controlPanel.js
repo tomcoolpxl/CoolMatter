@@ -2,6 +2,7 @@ import { config } from '../app/config.js'
 
 export function createControlPanel({
   state,
+  diagnostics,
   onRegenerationUpdate,
   onVisualUpdate,
   onResetCamera,
@@ -59,9 +60,15 @@ export function createControlPanel({
     step: 1,
   })
   const resetCameraButton = documentRef.createElement('button')
+  const diagnosticsSection = documentRef.createElement('section')
+  const diagnosticsHeading = documentRef.createElement('h2')
+  const diagnosticsBody = documentRef.createElement('dl')
 
   resetCameraButton.type = 'button'
   resetCameraButton.textContent = 'Reset camera'
+  diagnosticsSection.className = 'diagnostics'
+  diagnosticsHeading.textContent = 'Diagnostics'
+  diagnosticsBody.className = 'diagnostics-grid'
 
   stateSelect.input.addEventListener('change', () => {
     onRegenerationUpdate({
@@ -105,7 +112,10 @@ export function createControlPanel({
     nucleusModeSelect.field,
     seedInput.field,
     resetCameraButton,
+    diagnosticsSection,
   )
+  diagnosticsSection.append(diagnosticsHeading, diagnosticsBody)
+  updateDiagnostics(diagnosticsBody, diagnostics, documentRef)
 
   return {
     element,
@@ -118,7 +128,37 @@ export function createControlPanel({
       seedInput: seedInput.input,
       resetCameraButton,
     },
+    updateDiagnostics(nextDiagnostics) {
+      updateDiagnostics(diagnosticsBody, nextDiagnostics, documentRef)
+    },
   }
+}
+
+function updateDiagnostics(container, diagnostics, documentRef) {
+  container.replaceChildren(
+    ...createDiagnosticsEntries(documentRef, [
+      ['State', diagnostics.selectedStateId],
+      ['Sample count', String(diagnostics.sampleCount)],
+      ['Seed', String(diagnostics.seed)],
+      ['Truncation radius', String(diagnostics.truncationRadius)],
+      ['Last sample state', diagnostics.latestSampleStateId],
+      ['Last sample attempts', String(diagnostics.latestSampleAttemptCount)],
+      ['Validation', `${diagnostics.validationStatus} (${diagnostics.validationCheckCount} checks)`],
+      ['Validation command', diagnostics.validationCommand],
+    ]),
+  )
+}
+
+function createDiagnosticsEntries(documentRef, entries) {
+  return entries.flatMap(([termText, descriptionText]) => {
+    const term = documentRef.createElement('dt')
+    const description = documentRef.createElement('dd')
+
+    term.textContent = termText
+    description.textContent = descriptionText
+
+    return [term, description]
+  })
 }
 
 function createNumberControl(documentRef, {
