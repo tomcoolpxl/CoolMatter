@@ -5,16 +5,21 @@ import { describe, expect, it } from 'vitest'
 const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
 
 describe('GitHub Pages contract', () => {
-  it('does not depend on the Vite module entrypoint or external assets', () => {
+  it('uses a repository-safe relative module entry for the app', () => {
     expect(html).not.toContain('src="/src/main.js"')
-    expect(html).not.toContain('href="/src/')
-    expect(html).not.toContain('https://')
-    expect(html).toContain('<style>')
+    expect(html).toContain('src="./src/main.js"')
+    expect(html).toContain('<div id="app"')
   })
 
-  it('keeps the page self-contained for static hosting', () => {
+  it('includes an import map so GitHub Pages can resolve three.js modules statically', () => {
+    expect(html).toContain('<script type="importmap">')
+    expect(html).toContain('"three"')
+    expect(html).toContain('cdn.jsdelivr.net')
+  })
+
+  it('documents why the app can run on static hosting', () => {
     expect(html).toContain('<!doctype html>')
-    expect(html).toContain('This landing page is intentionally self-contained')
-    expect(html).toContain('inline HTML and CSS only')
+    expect(html).toContain('GitHub Pages can serve the viewer as a static site')
+    expect(html).toContain('hosted under a repository subpath')
   })
 })

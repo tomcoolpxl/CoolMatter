@@ -1,9 +1,9 @@
 # Current TODO
 
-## Phase 4 chunk 1
+## Maintenance
 
-* implement `src/utils/dispose.js`
-* add explicit resize handling to app composition
-* dispose replaced scene resources in the regeneration path
-* add unit and integration coverage for resize and disposal behavior
+* add Playwright as a proper e2e test layer
+* wire `package.json` scripts and config for `test:e2e`
+* add a real browser smoke test for the app host
+* document the e2e requirement in `GEMINI.md`
 * verify `npm run check`

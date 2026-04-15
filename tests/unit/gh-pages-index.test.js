@@ -5,14 +5,14 @@ import { describe, expect, it } from 'vitest'
 const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
 
 describe('GitHub Pages index', () => {
-  it('contains the project title and scientific framing', () => {
+  it('contains the project title and app host framing', () => {
     expect(html).toContain('<title>CoolMatter</title>')
-    expect(html).toContain('Hydrogen Stationary States')
+    expect(html).toContain('Validated Hydrogen Orbital Viewer')
     expect(html).toContain('rho(x, y, z) = |psi_nlm|^2')
   })
 
-  it('includes a GitHub Pages deployment section', () => {
-    expect(html).toContain('GitHub Pages contract')
-    expect(html).toContain('serve it directly as a static site')
+  it('includes an app mount and a relative module entry', () => {
+    expect(html).toContain('<div id="app"')
+    expect(html).toContain('src="./src/main.js"')
   })
 })
